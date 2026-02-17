@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الرئيسية - الهيئة العامة للشئون البحرية</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e4b7a;
+            --primary-dark: #0f2c4a;
+            --success: #28a745;
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+            --radius-lg: 16px;
+            --radius-md: 10px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Noto Sans Arabic', sans-serif;
+            background: #f1f5f9;
+            color: #343a40;
+            line-height: 1.6;
+        }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        
+        .main-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 16px 32px;
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .logo-img { height: 50px; }
+        
+        .logo-text h1 { font-size: 1.5rem; font-weight: 700; }
+        .logo-text p { font-size: 0.85rem; opacity: 0.9; }
+        
+        .nav-menu {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+        }
+        
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid white;
+            color: white;
+        }
+        
+        .btn-lg { padding: 14px 30px; font-size: 1.1rem; }
+        
+        .welcome-section {
+            background: linear-gradient(rgba(26, 54, 93, 0.95), rgba(13, 43, 78, 0.9)),
+                        url('https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+            background-size: cover;
+            background-position: center;
+            padding: 100px 0;
+            color: white;
+            text-align: center;
+        }
+        
+        .hero-title { font-size: 2.5rem; margin-bottom: 20px; }
+        .hero-text { font-size: 1.2rem; margin-bottom: 30px; opacity: 0.9; }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        
+        .mission-section,
+        .services-section,
+        .features-section {
+            padding: 80px 0;
+        }
+        
+        .mission-section { background-color: var(--white); }
+        .services-section { background-color: var(--light-gray); }
+        .features-section { background-color: var(--white); }
+        
+        .section-title {
+            text-align: center;
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 50px;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .feature-item {
+            text-align: center;
+            padding: 30px;
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+            transition: all 0.3s ease;
+        }
+        
+        .feature-item:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 2rem;
+        }
+        
+        .service-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+        
+        .service-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+            transition: all 0.3s ease;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .service-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 20px;
+        }
+        
+        .service-content { padding: 20px; }
+        
+        .service-content ul {
+            list-style: none;
+            margin: 15px 0;
+        }
+        
+        .service-content li {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .main-footer {
+            background: var(--primary-dark);
+            color: white;
+            padding: 60px 0 20px;
+        }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-col h4 {
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+        
+        .footer-col ul {
+            list-style: none;
+        }
+        
+        .footer-col ul li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-col ul li a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+        }
+        
+        .footer-col ul li a:hover { color: white; }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .header-container { flex-direction: column; gap: 15px; }
+            .nav-menu { flex-direction: column; text-align: center; }
+            .cta-buttons { flex-direction: column; }
+            .hero-title { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="container">
+            <div class="header-container">
+                <div class="logo-section">
+                    <img src="assets/images/logo.png" alt="شعار الهيئة" class="logo-img">
+                    <div class="logo-text">
+                        <h1>الهيئة العامة للشئون البحرية</h1>
+                        <p>نظام تسجيل السفن الإلكتروني</p>
+                    </div>
+                </div>
+                
+                <div class="nav-container">
+                    <ul class="nav-menu">
+                        <li><a href="index.html" class="nav-link active">الرئيسية</a></li>
+                        <li><a href="#services" class="nav-link">الخدمات</a></li>
+                        <li><a href="#about" class="nav-link">عن الهيئة</a></li>
+                        <li><a href="#contact" class="nav-link">اتصل بنا</a></li>
+                        <li><a href="ship-owner-register.html" class="nav-link">تسجيل السفن</a></li>
+                        <li><a href="login.html" class="nav-link btn-outline">دخول الموظفين</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="welcome-section">
+        <div class="container">
+            <h1 class="hero-title">مرحباً بكم في نظام تسجيل السفن الإلكتروني</h1>
+            <p class="hero-text">سجل سفينتك إلكترونياً بسهولة وأمان</p>
+            <div class="cta-buttons">
+                <a href="ship-owner-register.html" class="btn btn-primary btn-lg">
+                    <i class="fas fa-ship"></i> تسجيل سفينة جديدة
+                </a>
+                <a href="ship-owner-login.html" class="btn btn-outline btn-lg">
+                    <i class="fas fa-user-tie"></i> بوابة ملاك السفن
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="mission-section" id="about">
+        <div class="container">
+            <h2 class="section-title">مهمتنا ورؤيتنا</h2>
+            <div class="grid">
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-ship"></i></div>
+                    <h4>سلامة الملاحة البحرية</h4>
+                    <p>تنظيم ومراقبة وتأمين سلامة الملاحة البحرية وفقاً للمعايير الدولية</p>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                    <h4>حماية البيئة البحرية</h4>
+                    <p>الحفاظ على البيئة البحرية من التلوث وفق المعايير الدولية</p>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-anchor"></i></div>
+                    <h4>تكوين أسطول بحري</h4>
+                    <p>تشجيع تكوين أسطول بحري يمني يدعم التنمية الاقتصادية</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="services-section" id="services">
+        <div class="container">
+            <h2 class="section-title">الخدمات الإلكترونية</h2>
+            <div class="service-cards">
+                <div class="service-card">
+                    <div class="service-header">
+                        <h3>تسجيل السفن التجارية</h3>
+                    </div>
+                    <div class="service-content">
+                        <p>تسجيل السفن تحت العلم اليمني وفقاً للقانون البحري</p>
+                        <ul>
+                            <li><i class="fas fa-check-circle" style="color: var(--success);"></i> تسجيل السفن الجديدة</li>
+                            <li><i class="fas fa-check-circle" style="color: var(--success);"></i> تجديد تسجيل السفن</li>
+                        </ul>
+                        <a href="ship-owner-register.html" class="btn btn-primary">بدء التسجيل</a>
+                    </div>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-header">
+                        <h3>خدمات أخرى</h3>
+                    </div>
+                    <div class="service-content">
+                        <p>إصدار التراخيص والشهادات البحرية المختلفة</p>
+                        <ul>
+                            <li><i class="fas fa-check-circle" style="color: var(--success);"></i> تراخيص الملاحة</li>
+                            <li><i class="fas fa-check-circle" style="color: var(--success);"></i> شهادات الصلاحية</li>
+                            <li><i class="fas fa-check-circle" style="color: var(--success);"></i> تصديق الوثائق</li>
+                        </ul>
+                        <span class="btn btn-secondary" style="opacity:0.6; cursor:not-allowed;">قريباً</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features-section">
+        <div class="container">
+            <h2 class="section-title">مميزات النظام الإلكتروني</h2>
+            <div class="grid">
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+                    <h4>معالجة سريعة</h4>
+                    <p>إنجاز المعاملات في وقت قياسي</p>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-lock"></i></div>
+                    <h4>آمن ومحمي</h4>
+                    <p>نظام آمن مع تشفير البيانات</p>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-headset"></i></div>
+                    <h4>دعم فني</h4>
+                    <p>دعم فني على مدار الساعة</p>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-mobile-alt"></i></div>
+                    <h4>متعدد المنصات</h4>
+                    <p>يعمل على جميع الأجهزة</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="main-footer" id="contact">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>الهيئة العامة للشئون البحرية</h4>
+                    <p style="color: rgba(255,255,255,0.8);">هيئة حكومية بحرية مختصة بتنفيذ مهام الدولة في مجال الشئون البحرية.</p>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>روابط سريعة</h4>
+                    <ul>
+                        <li><a href="index.html"><i class="fas fa-chevron-left"></i> الرئيسية</a></li>
+                        <li><a href="ship-owner-register.html"><i class="fas fa-chevron-left"></i> تسجيل سفينة جديدة</a></li>
+                        <li><a href="login.html"><i class="fas fa-chevron-left"></i> دخول الموظفين</a></li>
+                        <li><a href="ship-owner-login.html"><i class="fas fa-chevron-left"></i> دخول الملاك</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>اتصل بنا</h4>
+                    <ul>
+                        <li><i class="fas fa-phone"></i> 017123456</li>
+                        <li><i class="fas fa-envelope"></i> info@maritime.gov.ye</li>
+                        <li><i class="fas fa-map-marker-alt"></i> عدن - الجمهورية اليمنية</li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>ساعات العمل</h4>
+                    <ul>
+                        <li><i class="fas fa-calendar"></i> الأحد - الخميس: 8 صباحاً - 3 مساءً</li>
+                        <li><i class="fas fa-clock"></i> خدمة الطوارئ: على مدار الساعة</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>جميع الحقوق محفوظة © 2025 الهيئة العامة للشئون البحرية</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // تمرير سلس للروابط
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    e.preventDefault();
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

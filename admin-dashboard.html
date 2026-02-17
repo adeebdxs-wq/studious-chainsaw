@@ -1,0 +1,1866 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم المسؤول - نظام تسجيل السفن</title>
+    
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #1e4b7a;
+            --primary-dark: #0f2c4a;
+            --primary-light: #2c7be5;
+            --secondary: #8b7355;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --info: #17a2b8;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --white: #ffffff;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans Arabic', sans-serif;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e6eef5 100%);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        /* شريط التنقل */
+        .main-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 16px 32px;
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo-img {
+            width: 50px;
+            height: 50px;
+        }
+
+        .logo-text h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .logo-text p {
+            margin: 5px 0 0;
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .user-controls {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255,255,255,0.1);
+            padding: 8px 20px;
+            border-radius: 30px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: var(--secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .user-role {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid white;
+            color: white;
+        }
+
+        .btn-outline:hover {
+            background: white;
+            color: var(--primary);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #1e7e34);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #c82333);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning), #e0a800);
+            color: white;
+        }
+
+        /* تخطيط لوحة التحكم */
+        .dashboard-wrapper {
+            display: flex;
+            min-height: calc(100vh - 82px);
+            max-width: 1600px;
+            margin: 20px auto;
+            gap: 20px;
+            padding: 0 20px;
+        }
+
+        /* الشريط الجانبي */
+        .admin-sidebar {
+            width: 280px;
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 102px;
+            height: fit-content;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 25px;
+        }
+
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .admin-avatar {
+            width: 70px;
+            height: 70px;
+            background: var(--secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            border: 3px solid rgba(255,255,255,0.3);
+        }
+
+        .admin-info h4 {
+            color: white;
+            margin: 0 0 5px;
+            font-size: 1.2rem;
+        }
+
+        .admin-info p {
+            color: rgba(255,255,255,0.9);
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .admin-role {
+            display: inline-block;
+            background: var(--secondary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-top: 8px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 20px 0;
+        }
+
+        .menu-item {
+            margin-bottom: 5px;
+        }
+
+        .menu-link {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 25px;
+            color: var(--dark);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-right: 4px solid transparent;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .menu-link:hover {
+            background: rgba(30, 75, 122, 0.05);
+            color: var(--primary);
+            border-right-color: var(--primary);
+        }
+
+        .menu-link.active {
+            background: rgba(30, 75, 122, 0.1);
+            color: var(--primary);
+            border-right-color: var(--primary);
+        }
+
+        .menu-icon {
+            width: 24px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .menu-badge {
+            margin-right: auto;
+            background: var(--primary);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* المحتوى الرئيسي */
+        .admin-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* بطاقات الإحصائيات */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 25px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+        }
+
+        .stat-content {
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: block;
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 0.95rem;
+            display: block;
+        }
+
+        /* الرسوم البيانية */
+        .charts-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 25px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-header h4 {
+            color: var(--primary);
+            margin: 0;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chart-container {
+            height: 280px;
+            position: relative;
+        }
+
+        /* الأقسام */
+        .section-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 25px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            color: var(--primary);
+            margin-bottom: 25px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        /* الجداول */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            background: linear-gradient(135deg, rgba(30, 75, 122, 0.05), rgba(15, 44, 74, 0.05));
+            color: var(--primary);
+            padding: 15px;
+            text-align: right;
+            font-weight: 700;
+            border-bottom: 2px solid var(--secondary);
+        }
+
+        .data-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+            color: var(--dark);
+        }
+
+        .data-table tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        .data-table tbody tr:hover {
+            background: rgba(30, 75, 122, 0.02);
+        }
+
+        /* علامات الحالة */
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-approved,
+        .status-active {
+            background: rgba(40, 167, 69, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(40, 167, 69, 0.2);
+        }
+
+        .status-pending {
+            background: rgba(255, 193, 7, 0.1);
+            color: #856404;
+            border: 1px solid rgba(255, 193, 7, 0.2);
+        }
+
+        .status-rejected {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(220, 53, 69, 0.2);
+        }
+
+        .status-reviewing {
+            background: rgba(23, 162, 184, 0.1);
+            color: var(--info);
+            border: 1px solid rgba(23, 162, 184, 0.2);
+        }
+
+        /* أزرار الإجراءات */
+        .action-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin: 0 2px;
+        }
+
+        .btn-view {
+            background: rgba(23, 162, 184, 0.1);
+            color: var(--info);
+            border: 1px solid rgba(23, 162, 184, 0.2);
+        }
+
+        .btn-edit {
+            background: rgba(255, 193, 7, 0.1);
+            color: #856404;
+            border: 1px solid rgba(255, 193, 7, 0.2);
+        }
+
+        .btn-delete {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(220, 53, 69, 0.2);
+        }
+
+        /* التبويبات */
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 5px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 25px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: #64748b;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .tab-btn:hover {
+            color: var(--primary);
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-badge {
+            background: var(--primary);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            margin-right: 8px;
+        }
+
+        /* النوافذ المنبثقة */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 600px;
+            border-radius: var(--radius-lg);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 20px;
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(30, 75, 122, 0.1);
+        }
+
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: left 15px center;
+            padding-left: 45px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748b;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #cbd5e1;
+            margin-bottom: 20px;
+        }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-content {
+            text-align: center;
+            color: white;
+        }
+
+        .loading-content i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 1200px) {
+            .dashboard-wrapper {
+                flex-direction: column;
+            }
+            .admin-sidebar {
+                width: 100%;
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+            .tabs {
+                flex-direction: column;
+            }
+            .tab-btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- شريط التنقل -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo-section">
+                <img src="../assets/images/logo.png" alt="شعار الهيئة" class="logo-img">
+                <div class="logo-text">
+                    <h1>الهيئة العامة للشئون البحرية</h1>
+                    <p>نظام تسجيل السفن الإلكتروني</p>
+                </div>
+            </div>
+            
+            <div class="user-controls">
+                <div class="user-profile" id="userProfile">
+                    <div class="user-avatar">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <div class="user-details">
+                        <span class="user-name" id="adminName">جاري التحميل...</span>
+                        <span class="user-role">مسؤول النظام</span>
+                    </div>
+                </div>
+                
+                <button class="btn btn-outline" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-wrapper">
+        <!-- الشريط الجانبي -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <div class="admin-profile">
+                    <div class="admin-avatar">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <div class="admin-info">
+                        <h4 id="sidebarAdminName">جاري التحميل...</h4>
+                        <p>المدير العام للنظام</p>
+                        <span class="admin-role">مسؤول النظام</span>
+                    </div>
+                </div>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="menu-item">
+                    <a class="menu-link active" onclick="showSection('dashboard')">
+                        <i class="fas fa-tachometer-alt menu-icon"></i>
+                        <span>لوحة التحكم</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" onclick="showSection('applications')">
+                        <i class="fas fa-ship menu-icon"></i>
+                        <span>جميع الطلبات</span>
+                        <span class="menu-badge" id="applicationsCount">0</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" onclick="showSection('employees')">
+                        <i class="fas fa-users menu-icon"></i>
+                        <span>إدارة الموظفين</span>
+                        <span class="menu-badge" id="employeesCount">0</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" onclick="showSection('ships')">
+                        <i class="fas fa-ship menu-icon"></i>
+                        <span>السفن المسجلة</span>
+                        <span class="menu-badge" id="shipsCount">0</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" onclick="showSection('reports')">
+                        <i class="fas fa-chart-bar menu-icon"></i>
+                        <span>التقارير</span>
+                    </a>
+                </li>
+                <li class="menu-item" style="margin-top: 30px;">
+                    <a class="menu-link" onclick="logout()">
+                        <i class="fas fa-sign-out-alt menu-icon"></i>
+                        <span>تسجيل الخروج</span>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- المحتوى الرئيسي -->
+        <main class="admin-content">
+            <!-- قسم لوحة التحكم -->
+            <div id="dashboardSection" style="display: block;">
+                <!-- بطاقات الإحصائيات -->
+                <div class="stats-grid" id="statsContainer">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, var(--primary), var(--primary-dark));">
+                            <i class="fas fa-ship"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-value" id="totalShipsStat">0</span>
+                            <span class="stat-label">إجمالي السفن المسجلة</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, var(--success), #1e7e34);">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-value" id="activeShipsStat">0</span>
+                            <span class="stat-label">سفن نشطة</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, var(--warning), #e0a800);">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-value" id="pendingApplicationsStat">0</span>
+                            <span class="stat-label">طلبات قيد المراجعة</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, var(--info), #117a8b);">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-value" id="totalEmployeesStat">0</span>
+                            <span class="stat-label">عدد الموظفين</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- الرسوم البيانية -->
+                <div class="charts-section">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h4><i class="fas fa-chart-line"></i> إحصائيات التسجيل الشهرية</h4>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="registrationsChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h4><i class="fas fa-chart-pie"></i> توزيع الطلبات حسب الحالة</h4>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="applicationsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- أحدث الطلبات -->
+                <section class="section-card">
+                    <div class="section-title">
+                        <h3><i class="fas fa-clock"></i> أحدث الطلبات</h3>
+                        <a class="btn btn-primary" onclick="showSection('applications')">
+                            عرض الكل <i class="fas fa-arrow-left"></i>
+                        </a>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="data-table" id="recentApplicationsTable">
+                            <thead>
+                                <tr>
+                                    <th>رقم الطلب</th>
+                                    <th>اسم السفينة</th>
+                                    <th>المالك</th>
+                                    <th>الفرع</th>
+                                    <th>تاريخ التقديم</th>
+                                    <th>الحالة</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentApplicationsBody">
+                                <tr>
+                                    <td colspan="7" style="text-align: center;">جاري تحميل البيانات...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <!-- قسم جميع الطلبات -->
+            <div id="applicationsSection" style="display: none;">
+                <section class="section-card">
+                    <div class="section-title">
+                        <h3><i class="fas fa-ship"></i> جميع طلبات التسجيل</h3>
+                    </div>
+
+                    <div class="tabs">
+                        <button class="tab-btn active" onclick="filterApplications('all')">
+                            الكل <span class="tab-badge" id="allAppsBadge">0</span>
+                        </button>
+                        <button class="tab-btn" onclick="filterApplications('pending')">
+                            قيد المراجعة <span class="tab-badge" id="pendingAppsBadge">0</span>
+                        </button>
+                        <button class="tab-btn" onclick="filterApplications('reviewing')">
+                            جاري المعالجة <span class="tab-badge" id="reviewingAppsBadge">0</span>
+                        </button>
+                        <button class="tab-btn" onclick="filterApplications('approved')">
+                            مكتملة <span class="tab-badge" id="approvedAppsBadge">0</span>
+                        </button>
+                        <button class="tab-btn" onclick="filterApplications('rejected')">
+                            مرفوضة <span class="tab-badge" id="rejectedAppsBadge">0</span>
+                        </button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="data-table" id="applicationsTable">
+                            <thead>
+                                <tr>
+                                    <th>رقم الطلب</th>
+                                    <th>اسم السفينة</th>
+                                    <th>المالك</th>
+                                    <th>الفرع</th>
+                                    <th>تاريخ التقديم</th>
+                                    <th>الموظف المسؤول</th>
+                                    <th>الحالة</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="applicationsBody">
+                                <tr>
+                                    <td colspan="8" style="text-align: center;">جاري تحميل البيانات...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <!-- قسم إدارة الموظفين -->
+            <div id="employeesSection" style="display: none;">
+                <section class="section-card">
+                    <div class="section-title">
+                        <h3><i class="fas fa-users"></i> إدارة الموظفين</h3>
+                        <button class="btn btn-primary" onclick="showAddEmployeeModal()">
+                            <i class="fas fa-user-plus"></i> إضافة موظف
+                        </button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="data-table" id="employeesTable">
+                            <thead>
+                                <tr>
+                                    <th>الاسم</th>
+                                    <th>البريد الإلكتروني</th>
+                                    <th>الفرع</th>
+                                    <th>المسمى الوظيفي</th>
+                                    <th>رقم الهاتف</th>
+                                    <th>الحالة</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="employeesBody">
+                                <tr>
+                                    <td colspan="7" style="text-align: center;">جاري تحميل البيانات...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <!-- قسم السفن المسجلة -->
+            <div id="shipsSection" style="display: none;">
+                <section class="section-card">
+                    <div class="section-title">
+                        <h3><i class="fas fa-ship"></i> السفن المسجلة</h3>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="data-table" id="shipsTable">
+                            <thead>
+                                <tr>
+                                    <th>رقم التسجيل</th>
+                                    <th>اسم السفينة</th>
+                                    <th>النوع</th>
+                                    <th>المالك</th>
+                                    <th>ميناء التسجيل</th>
+                                    <th>تاريخ التسجيل</th>
+                                    <th>الحالة</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="shipsBody">
+                                <tr>
+                                    <td colspan="8" style="text-align: center;">جاري تحميل البيانات...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <!-- قسم التقارير -->
+            <div id="reportsSection" style="display: none;">
+                <section class="section-card">
+                    <div class="section-title">
+                        <h3><i class="fas fa-chart-bar"></i> التقارير والإحصائيات</h3>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: linear-gradient(135deg, var(--info), #117a8b);">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h4>تقرير السفن الشهري</h4>
+                                <p style="margin: 10px 0; color: #666;">تقرير مفصل عن جميع السفن المسجلة خلال الشهر</p>
+                                <button class="btn btn-primary" onclick="generateReport('monthly_ships')">
+                                    <i class="fas fa-download"></i> تحميل
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: linear-gradient(135deg, var(--success), #1e7e34);">
+                                <i class="fas fa-file-excel"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h4>تقرير أداء الموظفين</h4>
+                                <p style="margin: 10px 0; color: #666;">إحصائيات إنجاز الموظفين حسب الفروع</p>
+                                <button class="btn btn-primary" onclick="generateReport('employees')">
+                                    <i class="fas fa-download"></i> تحميل
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: linear-gradient(135deg, var(--warning), #e0a800);">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h4>تقرير الإيرادات</h4>
+                                <p style="margin: 10px 0; color: #666;">تحليل الإيرادات حسب الفروع والخدمات</p>
+                                <button class="btn btn-primary" onclick="generateReport('revenue')">
+                                    <i class="fas fa-download"></i> تحميل
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- نافذة إضافة موظف -->
+    <div id="addEmployeeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-plus"></i> إضافة موظف جديد</h3>
+                <button class="modal-close" onclick="closeModal('addEmployeeModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addEmployeeForm" onsubmit="saveEmployee(event)">
+                    <div class="form-group">
+                        <label>الاسم الكامل</label>
+                        <input type="text" id="empFullName" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>البريد الإلكتروني</label>
+                        <input type="email" id="empEmail" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>كلمة المرور</label>
+                        <input type="password" id="empPassword" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>الفرع</label>
+                        <select id="empBranch" class="form-control" required>
+                            <option value="">اختر الفرع</option>
+                            <option value="aden">فرع عدن</option>
+                            <option value="mukalla">فرع المكلا</option>
+                            <option value="hodeidah">فرع الحديدة</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>المسمى الوظيفي</label>
+                        <input type="text" id="empPosition" class="form-control" placeholder="مثال: موظف تسجيل" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>رقم الهاتف</label>
+                        <input type="text" id="empPhone" class="form-control" placeholder="اختياري">
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline" onclick="closeModal('addEmployeeModal')">
+                            إلغاء
+                        </button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> حفظ
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة تعديل موظف -->
+    <div id="editEmployeeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-edit"></i> تعديل بيانات موظف</h3>
+                <button class="modal-close" onclick="closeModal('editEmployeeModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="editEmployeeForm" onsubmit="updateEmployee(event)">
+                    <input type="hidden" id="editEmployeeId">
+                    
+                    <div class="form-group">
+                        <label>الاسم الكامل</label>
+                        <input type="text" id="editEmpFullName" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>البريد الإلكتروني</label>
+                        <input type="email" id="editEmpEmail" class="form-control" required readonly style="background:#f5f5f5;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>كلمة المرور (اترك فارغاً إذا لم ترد التغيير)</label>
+                        <input type="password" id="editEmpPassword" class="form-control">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>الفرع</label>
+                        <select id="editEmpBranch" class="form-control" required>
+                            <option value="">اختر الفرع</option>
+                            <option value="aden">فرع عدن</option>
+                            <option value="mukalla">فرع المكلا</option>
+                            <option value="hodeidah">فرع الحديدة</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>المسمى الوظيفي</label>
+                        <input type="text" id="editEmpPosition" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>رقم الهاتف</label>
+                        <input type="text" id="editEmpPhone" class="form-control">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>الحالة</label>
+                        <select id="editEmpStatus" class="form-control">
+                            <option value="active">نشط</option>
+                            <option value="inactive">غير نشط</option>
+                        </select>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline" onclick="closeModal('editEmployeeModal')">
+                            إلغاء
+                        </button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> حفظ التغييرات
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- شاشة التحميل -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-content">
+            <i class="fas fa-circle-notch fa-spin"></i>
+            <h3>جاري تحميل البيانات...</h3>
+        </div>
+    </div>
+
+    <script>
+        // ================================================
+        // المتغيرات العامة
+        // ================================================
+        const apiBase = '/ship-registration/api';
+        let currentUser = null;
+        let applicationsData = [];
+        let employeesData = [];
+        let shipsData = [];
+        let registrationsChart = null;
+        let applicationsChart = null;
+
+        // ================================================
+        // التحقق من الجلسة وتحميل البيانات
+        // ================================================
+        document.addEventListener('DOMContentLoaded', async function() {
+            await checkAuth();
+            await loadAllData();
+        });
+
+        async function checkAuth() {
+            try {
+                const response = await fetch(apiBase + '/auth/check_session.php', {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                
+                if (!data.loggedIn || data.user.role !== 'admin') {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                currentUser = data.user;
+                document.getElementById('adminName').textContent = currentUser.full_name;
+                document.getElementById('sidebarAdminName').textContent = currentUser.full_name;
+                
+            } catch (error) {
+                console.error('خطأ في التحقق من الجلسة:', error);
+                window.location.href = 'login.html';
+            }
+        }
+
+        async function loadAllData() {
+            showLoading();
+            try {
+                await Promise.all([
+                    loadApplications(),
+                    loadEmployees(),
+                    loadShips(),
+                    loadChartData()
+                ]);
+            } catch (error) {
+                console.error('خطأ في تحميل البيانات:', error);
+                showToast('حدث خطأ في تحميل البيانات', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // ================================================
+        // تحميل الطلبات
+        // ================================================
+        async function loadApplications() {
+            const response = await fetch(apiBase + '/applications/get.php', {
+                credentials: 'include'
+            });
+            applicationsData = await response.json();
+            
+            updateApplicationsTables();
+            updateStatistics();
+        }
+
+        function updateApplicationsTables() {
+            // تحديث جدول الطلبات الرئيسي
+            const tbody = document.getElementById('applicationsBody');
+            const recentTbody = document.getElementById('recentApplicationsBody');
+            
+            if (applicationsData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">لا توجد طلبات</td></tr>';
+                recentTbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">لا توجد طلبات</td></tr>';
+                return;
+            }
+            
+            // جميع الطلبات
+            let html = '';
+            applicationsData.slice(0, 20).forEach(app => {
+                html += createApplicationRow(app);
+            });
+            tbody.innerHTML = html;
+            
+            // أحدث 5 طلبات للوحة الرئيسية
+            let recentHtml = '';
+            applicationsData.slice(0, 5).forEach(app => {
+                recentHtml += createApplicationRow(app, true);
+            });
+            recentTbody.innerHTML = recentHtml;
+            
+            // تحديث البادجات
+            updateApplicationBadges();
+        }
+
+        function createApplicationRow(app, simple = false) {
+            const statusClass = {
+                'pending': 'status-pending',
+                'reviewing': 'status-reviewing',
+                'approved': 'status-approved',
+                'rejected': 'status-rejected',
+                'completed': 'status-approved'
+            }[app.status] || 'status-pending';
+            
+            const statusText = {
+                'pending': 'قيد المراجعة',
+                'reviewing': 'جاري المعالجة',
+                'approved': 'مقبول',
+                'rejected': 'مرفوض',
+                'completed': 'مكتمل'
+            }[app.status] || app.status;
+            
+            if (simple) {
+                return `
+                    <tr>
+                        <td><strong>${app.application_number || '---'}</strong></td>
+                        <td>${app.ship_name_ar || '---'}</td>
+                        <td>${app.owner_name || '---'}</td>
+                        <td>${app.branch_name || app.branch_code || '---'}</td>
+                        <td>${formatDate(app.submission_date)}</td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td>
+                            <button class="action-btn btn-view" onclick="viewApplication(${app.id})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            return `
+                <tr>
+                    <td><strong>${app.application_number || '---'}</strong></td>
+                    <td>${app.ship_name_ar || '---'}</td>
+                    <td>${app.owner_name || '---'}</td>
+                    <td>${app.branch_name || app.branch_code || '---'}</td>
+                    <td>${formatDate(app.submission_date)}</td>
+                    <td>${app.assigned_name || 'غير معين'}</td>
+                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                    <td>
+                        <button class="action-btn btn-view" onclick="viewApplication(${app.id})">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }
+
+        function updateApplicationBadges() {
+            const all = applicationsData.length;
+            const pending = applicationsData.filter(a => a.status === 'pending').length;
+            const reviewing = applicationsData.filter(a => a.status === 'reviewing').length;
+            const approved = applicationsData.filter(a => ['approved', 'completed'].includes(a.status)).length;
+            const rejected = applicationsData.filter(a => a.status === 'rejected').length;
+            
+            document.getElementById('applicationsCount').textContent = all;
+            document.getElementById('allAppsBadge').textContent = all;
+            document.getElementById('pendingAppsBadge').textContent = pending;
+            document.getElementById('reviewingAppsBadge').textContent = reviewing;
+            document.getElementById('approvedAppsBadge').textContent = approved;
+            document.getElementById('rejectedAppsBadge').textContent = rejected;
+        }
+
+        // ================================================
+        // تحميل الموظفين
+        // ================================================
+        async function loadEmployees() {
+            const response = await fetch(apiBase + '/users/get.php', {
+                credentials: 'include'
+            });
+            employeesData = await response.json();
+            
+            updateEmployeesTable();
+            document.getElementById('employeesCount').textContent = employeesData.length;
+            document.getElementById('totalEmployeesStat').textContent = employeesData.length;
+        }
+
+        function updateEmployeesTable() {
+            const tbody = document.getElementById('employeesBody');
+            
+            if (employeesData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">لا يوجد موظفون</td></tr>';
+                return;
+            }
+            
+            let html = '';
+            employeesData.forEach(emp => {
+                if (emp.role === 'admin' && emp.email === 'admin@maritime.gov.ye') {
+                    return; // تخطي المسؤول الرئيسي من الجدول
+                }
+                
+                const branchNames = {
+                    'aden': 'عدن',
+                    'mukalla': 'المكلا',
+                    'hodeidah': 'الحديدة'
+                };
+                
+                html += `
+                    <tr>
+                        <td>${emp.full_name}</td>
+                        <td>${emp.email}</td>
+                        <td>${branchNames[emp.branch_code] || emp.branch_code || '---'}</td>
+                        <td>${emp.position || '---'}</td>
+                        <td>${emp.phone || '---'}</td>
+                        <td><span class="status-badge ${emp.status === 'active' ? 'status-approved' : 'status-rejected'}">${emp.status === 'active' ? 'نشط' : 'غير نشط'}</span></td>
+                        <td>
+                            <button class="action-btn btn-edit" onclick="editEmployee(${emp.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn btn-delete" onclick="deleteEmployee(${emp.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html || '<tr><td colspan="7" style="text-align: center;">لا يوجد موظفون</td></tr>';
+        }
+
+        // ================================================
+        // تحميل السفن
+        // ================================================
+        async function loadShips() {
+            const response = await fetch(apiBase + '/ships/get.php', {
+                credentials: 'include'
+            });
+            shipsData = await response.json();
+            
+            updateShipsTable();
+            document.getElementById('shipsCount').textContent = shipsData.length;
+            document.getElementById('totalShipsStat').textContent = shipsData.length;
+            document.getElementById('activeShipsStat').textContent = shipsData.filter(s => s.status === 'active').length;
+        }
+
+        function updateShipsTable() {
+            const tbody = document.getElementById('shipsBody');
+            
+            if (shipsData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">لا توجد سفن مسجلة</td></tr>';
+                return;
+            }
+            
+            let html = '';
+            shipsData.slice(0, 20).forEach(ship => {
+                const statusClass = {
+                    'active': 'status-approved',
+                    'pending': 'status-pending',
+                    'expired': 'status-rejected'
+                }[ship.status] || 'status-pending';
+                
+                const statusText = {
+                    'active': 'نشط',
+                    'pending': 'قيد المراجعة',
+                    'expired': 'منتهي'
+                }[ship.status] || ship.status;
+                
+                const portNames = {
+                    'aden': 'عدن',
+                    'mukalla': 'المكلا',
+                    'hodeidah': 'الحديدة'
+                };
+                
+                html += `
+                    <tr>
+                        <td><strong>${ship.registration_number || '---'}</strong></td>
+                        <td>${ship.ship_name_ar}</td>
+                        <td>${ship.ship_type}</td>
+                        <td>${ship.owner_name || '---'}</td>
+                        <td>${portNames[ship.port_of_registry] || ship.port_of_registry || '---'}</td>
+                        <td>${formatDate(ship.registration_date)}</td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td>
+                            <button class="action-btn btn-view" onclick="viewShip(${ship.id})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+
+        // ================================================
+        // إدارة الموظفين
+        // ================================================
+        function showAddEmployeeModal() {
+            document.getElementById('addEmployeeModal').style.display = 'flex';
+        }
+
+        async function saveEmployee(e) {
+            e.preventDefault();
+            
+            const formData = {
+                email: document.getElementById('empEmail').value,
+                password: document.getElementById('empPassword').value,
+                fullName: document.getElementById('empFullName').value,
+                role: 'branch_employee',
+                branch: document.getElementById('empBranch').value,
+                position: document.getElementById('empPosition').value,
+                phone: document.getElementById('empPhone').value || null
+            };
+            
+            showLoading('جاري إضافة الموظف...');
+            
+            try {
+                const response = await fetch(apiBase + '/users/add.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showToast('✅ تم إضافة الموظف بنجاح', 'success');
+                    closeModal('addEmployeeModal');
+                    document.getElementById('addEmployeeForm').reset();
+                    await loadEmployees();
+                } else {
+                    throw new Error(result.error || 'حدث خطأ');
+                }
+            } catch (error) {
+                showToast('خطأ: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function editEmployee(employeeId) {
+            try {
+                const response = await fetch(apiBase + '/users/get_one.php?id=' + employeeId, {
+                    credentials: 'include'
+                });
+                const employee = await response.json();
+                
+                document.getElementById('editEmployeeId').value = employee.id;
+                document.getElementById('editEmpFullName').value = employee.full_name;
+                document.getElementById('editEmpEmail').value = employee.email;
+                document.getElementById('editEmpBranch').value = employee.branch_code || '';
+                document.getElementById('editEmpPosition').value = employee.position || '';
+                document.getElementById('editEmpPhone').value = employee.phone || '';
+                document.getElementById('editEmpStatus').value = employee.status || 'active';
+                document.getElementById('editEmpPassword').value = '';
+                
+                document.getElementById('editEmployeeModal').style.display = 'flex';
+                
+            } catch (error) {
+                console.error('Error loading employee:', error);
+                showToast('فشل تحميل بيانات الموظف', 'error');
+            }
+        }
+
+        async function updateEmployee(e) {
+            e.preventDefault();
+            
+            const formData = {
+                id: document.getElementById('editEmployeeId').value,
+                fullName: document.getElementById('editEmpFullName').value,
+                branch: document.getElementById('editEmpBranch').value,
+                position: document.getElementById('editEmpPosition').value,
+                phone: document.getElementById('editEmpPhone').value || null,
+                status: document.getElementById('editEmpStatus').value
+            };
+            
+            const password = document.getElementById('editEmpPassword').value;
+            if (password) {
+                formData.password = password;
+            }
+            
+            showLoading('جاري تحديث البيانات...');
+            
+            try {
+                const response = await fetch(apiBase + '/users/update.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showToast('✅ تم تحديث البيانات بنجاح', 'success');
+                    closeModal('editEmployeeModal');
+                    await loadEmployees();
+                } else {
+                    throw new Error(result.error || 'حدث خطأ');
+                }
+            } catch (error) {
+                showToast('خطأ: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function deleteEmployee(employeeId) {
+            if (!confirm('هل أنت متأكد من حذف هذا الموظف؟')) return;
+            
+            try {
+                const response = await fetch(apiBase + '/users/delete.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ id: employeeId })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showToast('✅ تم حذف الموظف بنجاح', 'success');
+                    await loadEmployees();
+                } else {
+                    throw new Error(result.error || 'حدث خطأ');
+                }
+            } catch (error) {
+                showToast('خطأ: ' + error.message, 'error');
+            }
+        }
+
+        // ================================================
+        // تصفية الطلبات
+        // ================================================
+        function filterApplications(status) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            let filtered = applicationsData;
+            if (status !== 'all') {
+                if (status === 'approved') {
+                    filtered = applicationsData.filter(a => ['approved', 'completed'].includes(a.status));
+                } else {
+                    filtered = applicationsData.filter(a => a.status === status);
+                }
+            }
+            
+            const tbody = document.getElementById('applicationsBody');
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">لا توجد طلبات</td></tr>';
+                return;
+            }
+            
+            let html = '';
+            filtered.slice(0, 20).forEach(app => {
+                html += createApplicationRow(app);
+            });
+            tbody.innerHTML = html;
+        }
+
+        // ================================================
+        // تحديث الإحصائيات
+        // ================================================
+        function updateStatistics() {
+            const pendingCount = applicationsData.filter(a => a.status === 'pending').length;
+            document.getElementById('pendingApplicationsStat').textContent = pendingCount;
+            document.getElementById('pendingAppsBadge').textContent = pendingCount;
+        }
+
+        // ================================================
+        // الرسوم البيانية
+        // ================================================
+        async function loadChartData() {
+            try {
+                // بيانات التسجيل الشهري
+                const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 
+                               'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+                
+                const monthlyCounts = new Array(12).fill(0);
+                
+                shipsData.forEach(ship => {
+                    if (ship.registration_date) {
+                        const month = new Date(ship.registration_date).getMonth();
+                        monthlyCounts[month]++;
+                    }
+                });
+                
+                updateRegistrationsChart(months, monthlyCounts);
+                
+                // بيانات توزيع الطلبات
+                const statusCounts = {
+                    'pending': applicationsData.filter(a => a.status === 'pending').length,
+                    'reviewing': applicationsData.filter(a => a.status === 'reviewing').length,
+                    'approved': applicationsData.filter(a => ['approved', 'completed'].includes(a.status)).length,
+                    'rejected': applicationsData.filter(a => a.status === 'rejected').length
+                };
+                
+                updateApplicationsChart(statusCounts);
+                
+            } catch (error) {
+                console.error('خطأ في تحميل بيانات الرسوم البيانية:', error);
+            }
+        }
+
+        function updateRegistrationsChart(labels, data) {
+            const ctx = document.getElementById('registrationsChart').getContext('2d');
+            
+            if (registrationsChart) {
+                registrationsChart.destroy();
+            }
+            
+            registrationsChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'عدد السفن المسجلة',
+                        data: data,
+                        borderColor: '#1e4b7a',
+                        backgroundColor: 'rgba(30, 75, 122, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+                }
+            });
+        }
+
+        function updateApplicationsChart(data) {
+            const ctx = document.getElementById('applicationsChart').getContext('2d');
+            
+            if (applicationsChart) {
+                applicationsChart.destroy();
+            }
+            
+            applicationsChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['قيد المراجعة', 'جاري المعالجة', 'مكتملة', 'مرفوضة'],
+                    datasets: [{
+                        data: [data.pending, data.reviewing, data.approved, data.rejected],
+                        backgroundColor: ['#ffc107', '#17a2b8', '#28a745', '#dc3545'],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', rtl: true } },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        // ================================================
+        // دوال مساعدة
+        // ================================================
+        function showSection(sectionId) {
+            const sections = ['dashboard', 'applications', 'employees', 'ships', 'reports'];
+            
+            sections.forEach(id => {
+                const section = document.getElementById(`${id}Section`);
+                if (section) {
+                    section.style.display = id === sectionId ? 'block' : 'none';
+                }
+            });
+            
+            document.querySelectorAll('.menu-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            event.target.closest('.menu-link').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function formatDate(date) {
+            if (!date) return '---';
+            const d = new Date(date);
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function viewApplication(id) {
+            window.location.href = `application-details.html?id=${id}`;
+        }
+
+        function viewShip(id) {
+            window.location.href = `ship-details.html?id=${id}`;
+        }
+
+        function generateReport(type) {
+            showToast('سيتم إضافة خاصية التقارير قريباً', 'info');
+        }
+
+        function showLoading(message = 'جاري تحميل البيانات...') {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            document.querySelector('#loadingOverlay .loading-content h3').textContent = message;
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: ${type === 'success' ? 'linear-gradient(135deg, #28a745, #1e7e34)' : 
+                             type === 'error' ? 'linear-gradient(135deg, #dc3545, #c82333)' : 
+                             'linear-gradient(135deg, #1e4b7a, #0f2c4a)'};
+                color: white;
+                padding: 12px 24px;
+                border-radius: 30px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 9999;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                animation: slideDown 0.3s ease;
+            `;
+            toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i> ${message}`;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideUp 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ================================================
+        // تسجيل الخروج
+        // ================================================
+        async function logout() {
+            await fetch(apiBase + '/auth/logout.php', { 
+                method: 'POST',
+                credentials: 'include'
+            });
+            window.location.href = 'index.html';
+        }
+
+        // إضافة أنماط CSS للرسوم المتحركة
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideDown {
+                from { transform: translate(-50%, -100%); opacity: 0; }
+                to { transform: translate(-50%, 0); opacity: 1; }
+            }
+            @keyframes slideUp {
+                from { transform: translate(-50%, 0); opacity: 1; }
+                to { transform: translate(-50%, -100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

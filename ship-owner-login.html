@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل دخول الملاك - نظام تسجيل السفن</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e4b7a;
+            --primary-dark: #0f2c4a;
+            --success: #28a745;
+            --danger: #dc3545;
+            --border-color: #e2e8f0;
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --radius-lg: 16px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Noto Sans Arabic', sans-serif;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e6eef5 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 16px 32px;
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .nav-brand i { font-size: 1.8rem; }
+        .nav-brand h1 { font-size: 1.5rem; }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-light {
+            background: white;
+            color: var(--primary);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid white;
+            color: white;
+        }
+        
+        .login-container {
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 40px;
+            margin: 40px auto;
+            max-width: 500px;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .login-header i {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .login-header h2 { color: var(--primary); margin-bottom: 5px; }
+        .login-header p { color: #64748b; }
+        
+        .form-group { margin-bottom: 20px; }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-family: inherit;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(30, 75, 122, 0.1);
+        }
+        
+        .password-wrapper { position: relative; }
+        
+        .toggle-password {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+        }
+        
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+        
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        
+        .register-link {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .register-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .demo-credentials {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .demo-credentials h4 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .credential-item {
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            border-right: 3px solid var(--primary);
+        }
+        
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .loading-content { text-align: center; color: white; }
+        .loading-content i { font-size: 3rem; margin-bottom: 20px; }
+        
+        .error-message {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container container">
+            <a href="index.html" class="nav-brand">
+                <i class="fas fa-ship"></i>
+                <h1>نظام تسجيل السفن</h1>
+            </a>
+            <a href="login.html" class="btn btn-outline">
+                <i class="fas fa-user-shield"></i> دخول الموظفين
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="login-container">
+            <div class="login-header">
+                <i class="fas fa-user-tie"></i>
+                <h2>تسجيل دخول ملاك السفن</h2>
+                <p>أدخل بيانات حسابك للدخول</p>
+            </div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> البريد الإلكتروني</label>
+                    <input type="email" id="email" class="form-control" value="owner@example.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> كلمة المرور</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="password" class="form-control" value="owner123" required>
+                        <button type="button" class="toggle-password" onclick="togglePassword()">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary">تسجيل الدخول</button>
+            </form>
+
+            <div class="register-link">
+                ليس لديك حساب؟ <a href="ship-owner-register.html">تسجيل سفينة جديدة</a>
+            </div>
+
+            <div class="demo-credentials">
+                <h4><i class="fas fa-key"></i> بيانات الدخول التجريبية</h4>
+                <div class="credential-item">
+                    <strong>مالك تجريبي:</strong> owner@example.com / owner123
+                </div>
+            </div>
+            
+            <div class="footer">
+                <p>© 2025 الهيئة العامة للشئون البحرية</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-content">
+            <i class="fas fa-circle-notch fa-spin"></i>
+            <h3>جاري تسجيل الدخول...</h3>
+        </div>
+    </div>
+
+    <script>
+        const apiBase = '/ship-registration/api';
+
+        function togglePassword() {
+            const input = document.getElementById('password');
+            const icon = document.querySelector('.toggle-password i');
+            input.type = input.type === 'password' ? 'text' : 'password';
+            icon.className = input.type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
+        }
+
+       document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    // التحقق من أن الحقول ليست فارغة
+    if (!email || !password) {
+        showError('الرجاء إدخال البريد الإلكتروني وكلمة المرور');
+        return;
+    }
+
+    document.getElementById('loadingOverlay').style.display = 'flex';
+
+    try {
+        console.log('Sending request to:', apiBase + '/auth/login.php');
+        console.log('Data:', { email, password });
+        
+        const response = await fetch(apiBase + '/auth/login.php', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({ email, password })
+        });
+
+        console.log('Response status:', response.status);
+        
+        // التحقق من أن الاستجابة هي JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            console.error('Received non-JSON response:', text.substring(0, 200));
+            throw new Error('الاستجابة من السيرفر ليست JSON صحيح');
+        }
+
+        const data = await response.json();
+        console.log('Response data:', data);
+
+        if (response.ok) {
+            if (data.success) {
+                if (data.user.role !== 'ship_owner') {
+                    throw new Error('هذه الصفحة مخصصة لأصحاب السفن فقط');
+                }
+                
+                localStorage.setItem('currentUser', JSON.stringify(data.user));
+                window.location.href = 'ship-owner-dashboard.html';
+            } else {
+                throw new Error(data.error || 'فشل تسجيل الدخول');
+            }
+        } else {
+            throw new Error(data.error || 'فشل تسجيل الدخول');
+        }
+    } catch (error) {
+        document.getElementById('loadingOverlay').style.display = 'none';
+        console.error('Login error:', error);
+        showError(error.message);
+    }
+});
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message}`;
+            
+            const form = document.getElementById('loginForm');
+            form.parentNode.insertBefore(errorDiv, form);
+            
+            setTimeout(() => errorDiv.remove(), 5000);
+        }
+
+        function showError(message) {
+    // إزالة أي رسالة خطأ سابقة
+    const oldError = document.querySelector('.error-message');
+    if (oldError) oldError.remove();
+    
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message';
+    errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message}`;
+    
+    const form = document.getElementById('loginForm');
+    form.parentNode.insertBefore(errorDiv, form);
+    
+    setTimeout(() => errorDiv.remove(), 5000);
+}
+    </script>
+</body>
+</html>

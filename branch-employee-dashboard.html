@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم موظف الفرع - نظام تسجيل السفن</title>
+    
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #1e4b7a;
+            --primary-dark: #0f2c4a;
+            --primary-light: #2c7be5;
+            --secondary: #8b7355;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --info: #17a2b8;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --white: #ffffff;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans Arabic', sans-serif;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e6eef5 100%);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        /* شريط التنقل */
+        .main-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 16px 32px;
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo-img {
+            width: 50px;
+            height: 50px;
+        }
+
+        .logo-text h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .logo-text p {
+            margin: 5px 0 0;
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .user-controls {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255,255,255,0.1);
+            padding: 8px 20px;
+            border-radius: 30px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: var(--secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .user-role {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid white;
+            color: white;
+        }
+
+        .btn-outline:hover {
+            background: white;
+            color: var(--primary);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #1e7e34);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #c82333);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning), #e0a800);
+            color: white;
+        }
+
+        /* تخطيط لوحة التحكم */
+        .dashboard-wrapper {
+            display: flex;
+            min-height: calc(100vh - 82px);
+            max-width: 1600px;
+            margin: 20px auto;
+            gap: 20px;
+            padding: 0 20px;
+        }
+
+        /* الشريط الجانبي */
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 102px;
+            height: fit-content;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 25px;
+        }
+
+        .employee-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .employee-avatar {
+            width: 70px;
+            height: 70px;
+            background: var(--secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            border: 3px solid rgba(255,255,255,0.3);
+        }
+
+        .employee-info h4 {
+            color: white;
+            margin: 0 0 5px;
+            font-size: 1.2rem;
+        }
+
+        .employee-info p {
+            color: rgba(255,255,255,0.9);
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .branch-badge {
+            display: inline-block;
+            background: var(--secondary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-top: 8px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 20px 0;
+        }
+
+        .menu-item {
+            margin-bottom: 5px;
+        }
+
+        .menu-link {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 25px;
+            color: var(--dark);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-right: 4px solid transparent;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .menu-link:hover {
+            background: rgba(30, 75, 122, 0.05);
+            color: var(--primary);
+            border-right-color: var(--primary);
+        }
+
+        .menu-link.active {
+            background: rgba(30, 75, 122, 0.1);
+            color: var(--primary);
+            border-right-color: var(--primary);
+        }
+
+        .menu-icon {
+            width: 24px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .menu-badge {
+            margin-right: auto;
+            background: var(--primary);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* المحتوى الرئيسي */
+        .main-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* بطاقات الإحصائيات */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 25px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+        }
+
+        .stat-content {
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: block;
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 0.95rem;
+            display: block;
+        }
+
+        /* الأقسام */
+        .section-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 25px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            color: var(--primary);
+            margin-bottom: 25px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        /* بطاقات الطلبات */
+        .applications-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .application-card {
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius-md);
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .application-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .app-number {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        .app-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .app-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 15px;
+        }
+
+        .app-details {
+            margin-bottom: 20px;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 10px;
+            color: #64748b;
+        }
+
+        .detail-label {
+            width: 100px;
+            font-weight: 600;
+        }
+
+        .detail-value {
+            flex: 1;
+        }
+
+        .app-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        /* علامات الحالة */
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: rgba(255, 193, 7, 0.1);
+            color: #856404;
+            border: 1px solid rgba(255, 193, 7, 0.2);
+        }
+
+        .status-reviewing {
+            background: rgba(23, 162, 184, 0.1);
+            color: var(--info);
+            border: 1px solid rgba(23, 162, 184, 0.2);
+        }
+
+        .status-approved,
+        .status-active {
+            background: rgba(40, 167, 69, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(40, 167, 69, 0.2);
+        }
+
+        .status-rejected {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(220, 53, 69, 0.2);
+        }
+
+        .status-ready {
+            background: rgba(40, 167, 69, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(40, 167, 69, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        /* النوافذ المنبثقة */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 500px;
+            border-radius: var(--radius-lg);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 20px;
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(30, 75, 122, 0.1);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748b;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #cbd5e1;
+            margin-bottom: 20px;
+        }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-content {
+            text-align: center;
+            color: white;
+        }
+
+        .loading-content i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+
+        @media (max-width: 1200px) {
+            .dashboard-wrapper {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .applications-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- شريط التنقل -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo-section">
+                <img src="../assets/images/logo.png" alt="شعار الهيئة" class="logo-img">
+                <div class="logo-text">
+                    <h1>الهيئة العامة للشئون البحرية</h1>
+                    <p>نظام تسجيل السفن الإلكتروني</p>
+                </div>
+            </div>
+            
+            <div class="user-controls">
+                <div class="user-profile" id="userProfile">
+                    <div class="user-avatar">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="user-details">
+                        <span class="user-name" id="employeeName">جاري التحميل...</span>
+                        <span class="user-role" id="employeeRole">موظف فرع</span>
+                    </div>
+                </div>
+                
+                <button class="btn btn-outline" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-wrapper">
+        <!-- الشريط الجانبي -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="employee-profile">
+                    <div class="employee-avatar">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="employee-info">
+                        <h4 id="sidebarEmployeeName">جاري التحميل...</h4>
+                        <p id="sidebarEmployeePosition">موظف فرع</p>
+                        <span class="branch-badge" id="branchBadge">---</span>
+                    </div>
+                </div>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="menu-item">
+                    <a class="menu-link active" onclick="showSection('dashboard')">
+                        <i class="fas fa-tachometer-alt menu-icon"></i>
+                        <span>لوحة التحكم</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" onclick="showSection('pending')">
+                        <i class="fas fa-clock menu-icon"></i>
+                        <span>طلبات قيد المراجعة</span>
+                        <span class="menu-badge" id="pendingCount">0</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" onclick="showSection('reviewing')">
+                        <i class="fas fa-cogs menu-icon"></i>
+                        <span>جاري المعالجة</span>
+                        <span class="menu-badge" id="reviewingCount">0</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" onclick="showSection('completed')">
+                        <i class="fas fa-flag-checkered menu-icon"></i>
+                        <span>الطلبات المكتملة</span>
+                        <span class="menu-badge" id="completedCount">0</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" onclick="showSection('ships')">
+                        <i class="fas fa-ship menu-icon"></i>
+                        <span>سفن الفرع</span>
+                        <span class="menu-badge" id="branchShipsCount">0</span>
+                    </a>
+                </li>
+                <li class="menu-item" style="margin-top: 30px;">
+                    <a class="menu-link" onclick="logout()">
+                        <i class="fas fa-sign-out-alt menu-icon"></i>
+                        <span>تسجيل الخروج</span>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- المحتوى الرئيسي -->
+        <main class="main-content">
+            <!-- قسم لوحة التحكم -->
+            <div id="dashboardSection" style="display: block;">
+                <!-- بطاقات الإحصائيات -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, var(--primary), var(--primary-dark));">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-value" id="statPending">0</span>
+                            <span class="stat-label">طلبات قيد المراجعة</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, var(--info), #117a8b);">
+                            <i class="fas fa-cogs"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-value" id="statReviewing">0</span>
+                            <span class="stat-label">جاري المعالجة</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, var(--success), #1e7e34);">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-value" id="statCompleted">0</span>
+                            <span class="stat-label">مكتملة</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, var(--secondary), #6b4f3a);">
+                            <i class="fas fa-ship"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-value" id="statShips">0</span>
+                            <span class="stat-label">سفن مسجلة</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- طلبات قيد المراجعة -->
+                <section class="section-card">
+                    <div class="section-title">
+                        <h3><i class="fas fa-clock"></i> طلبات قيد المراجعة</h3>
+                        <a class="btn btn-primary" onclick="showSection('pending')">
+                            عرض الكل <i class="fas fa-arrow-left"></i>
+                        </a>
+                    </div>
+
+                    <div id="pendingApplications" class="applications-grid">
+                        <!-- سيتم ملؤها ديناميكياً -->
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <h3>لا توجد طلبات قيد المراجعة</h3>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- آخر الطلبات المكتملة -->
+                <section class="section-card">
+                    <div class="section-title">
+                        <h3><i class="fas fa-flag-checkered"></i> آخر الطلبات المكتملة</h3>
+                        <a class="btn btn-outline" onclick="showSection('completed')">
+                            عرض الكل
+                        </a>
+                    </div>
+
+                    <div id="recentCompletedApplications" class="applications-grid">
+                        <!-- سيتم ملؤها ديناميكياً -->
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <h3>لا توجد طلبات مكتملة</h3>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- قسم طلبات قيد المراجعة -->
+            <div id="pendingSection" style="display: none;">
+                <section class="section-card">
+                    <div class="section-title">
+                        <h3><i class="fas fa-clock"></i> طلبات قيد المراجعة</h3>
+                    </div>
+
+                    <div id="pendingApplicationsFull" class="applications-grid">
+                        <!-- سيتم ملؤها ديناميكياً -->
+                    </div>
+                </section>
+            </div>
+
+            <!-- قسم طلبات جاري المعالجة -->
+            <div id="reviewingSection" style="display: none;">
+                <section class="section-card">
+                    <div class="section-title">
+                        <h3><i class="fas fa-cogs"></i> طلبات جاري المعالجة</h3>
+                    </div>
+
+                    <div id="reviewingApplications" class="applications-grid">
+                        <!-- سيتم ملؤها ديناميكياً -->
+                    </div>
+                </section>
+            </div>
+
+            <!-- قسم الطلبات المكتملة -->
+            <div id="completedSection" style="display: none;">
+                <section class="section-card">
+                    <div class="section-title">
+                        <h3><i class="fas fa-flag-checkered"></i> الطلبات المكتملة</h3>
+                    </div>
+
+                    <div id="completedApplications" class="applications-grid">
+                        <!-- سيتم ملؤها ديناميكياً -->
+                    </div>
+                </section>
+            </div>
+
+            <!-- قسم سفن الفرع -->
+            <div id="shipsSection" style="display: none;">
+                <section class="section-card">
+                    <div class="section-title">
+                        <h3><i class="fas fa-ship"></i> السفن المسجلة في الفرع</h3>
+                    </div>
+
+                    <div id="branchShips" class="applications-grid">
+                        <!-- سيتم ملؤها ديناميكياً -->
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- نافذة رفض الطلب -->
+    <div id="rejectModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-times-circle"></i> رفض الطلب</h3>
+                <button class="modal-close" onclick="closeModal('rejectModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="rejectForm" onsubmit="submitRejection(event)">
+                    <input type="hidden" id="rejectApplicationId">
+                    
+                    <div class="form-group">
+                        <label>سبب الرفض</label>
+                        <textarea id="rejectionReason" class="form-control" rows="4" placeholder="يرجى كتابة سبب رفض الطلب" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>ملاحظات إضافية (اختياري)</label>
+                        <textarea id="rejectionNotes" class="form-control" rows="2" placeholder="ملاحظات داخلية"></textarea>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline" onclick="closeModal('rejectModal')">
+                            إلغاء
+                        </button>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-times"></i> تأكيد الرفض
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة قبول الطلب -->
+    <div id="acceptModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-check-circle"></i> قبول الطلب</h3>
+                <button class="modal-close" onclick="closeModal('acceptModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="acceptForm" onsubmit="submitAcceptance(event)">
+                    <input type="hidden" id="acceptApplicationId">
+                    
+                    <div class="form-group">
+                        <label>ملاحظات (اختياري)</label>
+                        <textarea id="acceptNotes" class="form-control" rows="3" placeholder="أي ملاحظات إضافية..."></textarea>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline" onclick="closeModal('acceptModal')">
+                            إلغاء
+                        </button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-check"></i> تأكيد القبول
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- شاشة التحميل -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-content">
+            <i class="fas fa-circle-notch fa-spin"></i>
+            <h3>جاري تحميل البيانات...</h3>
+        </div>
+    </div>
+
+    <script>
+        // ================================================
+        // المتغيرات العامة
+        // ================================================
+        const apiBase = '/ship-registration/api';
+        let currentUser = null;
+        let applicationsData = {
+            pending: [],
+            reviewing: [],
+            completed: []
+        };
+        let branchShipsData = [];
+
+        // ================================================
+        // التحقق من الجلسة وتحميل البيانات
+        // ================================================
+        document.addEventListener('DOMContentLoaded', async function() {
+            await checkAuth();
+            await loadAllData();
+        });
+
+        async function checkAuth() {
+            try {
+                const response = await fetch(apiBase + '/auth/check_session.php', {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                
+                if (!data.loggedIn || data.user.role !== 'branch_employee') {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                currentUser = data.user;
+                
+                const branchNames = {
+                    'aden': 'عدن',
+                    'mukalla': 'المكلا',
+                    'hodeidah': 'الحديدة'
+                };
+                
+                document.getElementById('employeeName').textContent = currentUser.full_name;
+                document.getElementById('sidebarEmployeeName').textContent = currentUser.full_name;
+                document.getElementById('sidebarEmployeePosition').textContent = currentUser.position || 'موظف فرع';
+                document.getElementById('branchBadge').textContent = branchNames[currentUser.branch_code] || currentUser.branch_code;
+                
+            } catch (error) {
+                console.error('خطأ في التحقق من الجلسة:', error);
+                window.location.href = 'login.html';
+            }
+        }
+
+        async function loadAllData() {
+            showLoading();
+            try {
+                await Promise.all([
+                    loadApplications(),
+                    loadBranchShips()
+                ]);
+            } catch (error) {
+                console.error('خطأ في تحميل البيانات:', error);
+                showToast('حدث خطأ في تحميل البيانات', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // ================================================
+        // تحميل الطلبات حسب الفرع
+        // ================================================
+        async function loadApplications() {
+            const response = await fetch(apiBase + '/applications/get_by_branch.php?branch=' + currentUser.branch_code, {
+                credentials: 'include'
+            });
+            const allApps = await response.json();
+            
+            applicationsData = {
+                pending: allApps.filter(a => a.status === 'pending'),
+                reviewing: allApps.filter(a => a.status === 'reviewing'),
+                completed: allApps.filter(a => ['approved', 'completed'].includes(a.status))
+            };
+            
+            updateStatistics();
+            updateApplicationsDisplay();
+        }
+
+        function updateStatistics() {
+            const pendingCount = applicationsData.pending.length;
+            const reviewingCount = applicationsData.reviewing.length;
+            const completedCount = applicationsData.completed.length;
+            
+            document.getElementById('statPending').textContent = pendingCount;
+            document.getElementById('statReviewing').textContent = reviewingCount;
+            document.getElementById('statCompleted').textContent = completedCount;
+            
+            document.getElementById('pendingCount').textContent = pendingCount;
+            document.getElementById('reviewingCount').textContent = reviewingCount;
+            document.getElementById('completedCount').textContent = completedCount;
+        }
+
+        function updateApplicationsDisplay() {
+            // طلبات قيد المراجعة (الصفحة الرئيسية)
+            updateApplicationGrid('pendingApplications', applicationsData.pending.slice(0, 3), 'pending');
+            
+            // طلبات مكتملة حديثاً (الصفحة الرئيسية)
+            updateApplicationGrid('recentCompletedApplications', applicationsData.completed.slice(0, 3), 'completed');
+            
+            // طلبات قيد المراجعة (الصفحة الكاملة)
+            updateApplicationGrid('pendingApplicationsFull', applicationsData.pending, 'pending');
+            
+            // طلبات جاري المعالجة
+            updateApplicationGrid('reviewingApplications', applicationsData.reviewing, 'reviewing');
+            
+            // الطلبات المكتملة
+            updateApplicationGrid('completedApplications', applicationsData.completed, 'completed');
+        }
+
+        function updateApplicationGrid(containerId, applications, type) {
+            const container = document.getElementById(containerId);
+            
+            if (applications.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h3>لا توجد طلبات</h3>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            applications.forEach(app => {
+                html += createApplicationCard(app, type);
+            });
+            container.innerHTML = html;
+        }
+
+        function createApplicationCard(app, type) {
+            const statusClass = {
+                'pending': 'status-pending',
+                'reviewing': 'status-reviewing',
+                'approved': 'status-approved',
+                'completed': 'status-approved'
+            }[app.status] || 'status-pending';
+            
+            const statusText = {
+                'pending': 'قيد المراجعة',
+                'reviewing': 'جاري المعالجة',
+                'approved': 'مقبول',
+                'completed': 'مكتمل'
+            }[app.status] || app.status;
+            
+            let actionButtons = '';
+            
+            if (type === 'pending') {
+                actionButtons = `
+                    <button class="btn btn-sm btn-primary" onclick="assignToMe(${app.id})">
+                        <i class="fas fa-user-check"></i> تعيين لي
+                    </button>
+                `;
+            } else if (type === 'reviewing') {
+                actionButtons = `
+                    <button class="btn btn-sm btn-success" onclick="openAcceptModal(${app.id})">
+                        <i class="fas fa-check"></i> قبول
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="openRejectModal(${app.id})">
+                        <i class="fas fa-times"></i> رفض
+                    </button>
+                `;
+            }
+            
+            return `
+                <div class="application-card">
+                    <div class="app-header">
+                        <span class="app-number">${app.application_number || '---'}</span>
+                        <span class="app-status ${statusClass}">${statusText}</span>
+                    </div>
+                    <div class="app-title">
+                        ${app.ship_name_ar || 'سفينة بدون اسم'}
+                    </div>
+                    <div class="app-details">
+                        <div class="detail-row">
+                            <span class="detail-label">المالك:</span>
+                            <span class="detail-value">${app.owner_name || '---'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">رقم IMO:</span>
+                            <span class="detail-value">${app.imo_number || '---'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">الحمولة:</span>
+                            <span class="detail-value">${app.gross_tonnage || '---'} طن</span>
+                        </div>
+                    </div>
+                    <div class="app-actions">
+                        <button class="btn btn-sm btn-outline" onclick="viewApplication(${app.id})">
+                            <i class="fas fa-eye"></i> عرض
+                        </button>
+                        ${actionButtons}
+                    </div>
+                </div>
+            `;
+        }
+
+        // ================================================
+        // إجراءات الموظف على الطلبات
+        // ================================================
+        async function assignToMe(applicationId) {
+            showLoading('جاري تعيين الطلب...');
+            
+            try {
+                const response = await fetch(apiBase + '/applications/assign.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        applicationId: applicationId,
+                        employeeId: currentUser.id
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showToast('✅ تم تعيين الطلب إليك', 'success');
+                    await loadApplications();
+                } else {
+                    throw new Error(result.error || 'حدث خطأ');
+                }
+            } catch (error) {
+                showToast('خطأ: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function openRejectModal(applicationId) {
+            document.getElementById('rejectApplicationId').value = applicationId;
+            document.getElementById('rejectModal').style.display = 'flex';
+        }
+
+        async function submitRejection(e) {
+            e.preventDefault();
+            
+            const applicationId = document.getElementById('rejectApplicationId').value;
+            const reason = document.getElementById('rejectionReason').value;
+            const notes = document.getElementById('rejectionNotes').value;
+            
+            showLoading('جاري رفض الطلب...');
+            
+            try {
+                const response = await fetch(apiBase + '/applications/reject.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        applicationId: applicationId,
+                        reason: reason,
+                        notes: notes
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showToast('✅ تم رفض الطلب وإشعار المسؤول', 'success');
+                    closeModal('rejectModal');
+                    document.getElementById('rejectForm').reset();
+                    await loadApplications();
+                } else {
+                    throw new Error(result.error || 'حدث خطأ');
+                }
+            } catch (error) {
+                showToast('خطأ: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function openAcceptModal(applicationId) {
+            document.getElementById('acceptApplicationId').value = applicationId;
+            document.getElementById('acceptModal').style.display = 'flex';
+        }
+
+        async function submitAcceptance(e) {
+            e.preventDefault();
+            
+            const applicationId = document.getElementById('acceptApplicationId').value;
+            const notes = document.getElementById('acceptNotes').value;
+            
+            showLoading('جاري قبول الطلب...');
+            
+            try {
+                const response = await fetch(apiBase + '/applications/update_status.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        applicationId: applicationId,
+                        status: 'approved',
+                        notes: notes
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showToast('✅ تم قبول الطلب', 'success');
+                    closeModal('acceptModal');
+                    document.getElementById('acceptForm').reset();
+                    await loadApplications();
+                } else {
+                    throw new Error(result.error || 'حدث خطأ');
+                }
+            } catch (error) {
+                showToast('خطأ: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // ================================================
+        // تحميل سفن الفرع
+        // ================================================
+        async function loadBranchShips() {
+            const response = await fetch(apiBase + '/ships/get.php?branch=' + currentUser.branch_code, {
+                credentials: 'include'
+            });
+            branchShipsData = await response.json();
+            
+            document.getElementById('statShips').textContent = branchShipsData.length;
+            document.getElementById('branchShipsCount').textContent = branchShipsData.length;
+            
+            updateBranchShipsDisplay();
+        }
+
+        function updateBranchShipsDisplay() {
+            const container = document.getElementById('branchShips');
+            
+            if (branchShipsData.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h3>لا توجد سفن مسجلة في هذا الفرع</h3>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            branchShipsData.slice(0, 10).forEach(ship => {
+                const statusClass = {
+                    'active': 'status-approved',
+                    'pending': 'status-pending',
+                    'expired': 'status-rejected'
+                }[ship.status] || 'status-pending';
+                
+                const statusText = {
+                    'active': 'نشط',
+                    'pending': 'قيد المراجعة',
+                    'expired': 'منتهي'
+                }[ship.status] || ship.status;
+                
+                html += `
+                    <div class="application-card">
+                        <div class="app-header">
+                            <span class="app-number">${ship.registration_number || '---'}</span>
+                            <span class="app-status ${statusClass}">${statusText}</span>
+                        </div>
+                        <div class="app-title">${ship.ship_name_ar}</div>
+                        <div class="app-details">
+                            <div class="detail-row">
+                                <span class="detail-label">النوع:</span>
+                                <span class="detail-value">${ship.ship_type}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">الحمولة:</span>
+                                <span class="detail-value">${ship.gross_tonnage || '---'} طن</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">المالك:</span>
+                                <span class="detail-value">${ship.owner_name || '---'}</span>
+                            </div>
+                        </div>
+                        <div class="app-actions">
+                            <button class="btn btn-sm btn-outline" onclick="viewShip(${ship.id})">
+                                <i class="fas fa-eye"></i> عرض
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // ================================================
+        // دوال مساعدة
+        // ================================================
+        function showSection(sectionId) {
+            const sections = ['dashboard', 'pending', 'reviewing', 'completed', 'ships'];
+            
+            sections.forEach(id => {
+                const section = document.getElementById(`${id}Section`);
+                if (section) {
+                    section.style.display = id === sectionId ? 'block' : 'none';
+                }
+            });
+            
+            document.querySelectorAll('.menu-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            event.target.closest('.menu-link').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function viewApplication(id) {
+            window.location.href = `application-details.html?id=${id}`;
+        }
+
+        function viewShip(id) {
+            window.location.href = `ship-details.html?id=${id}`;
+        }
+
+        function showLoading(message = 'جاري تحميل البيانات...') {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            document.querySelector('#loadingOverlay .loading-content h3').textContent = message;
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: ${type === 'success' ? 'linear-gradient(135deg, #28a745, #1e7e34)' : 
+                             type === 'error' ? 'linear-gradient(135deg, #dc3545, #c82333)' : 
+                             'linear-gradient(135deg, #1e4b7a, #0f2c4a)'};
+                color: white;
+                padding: 12px 24px;
+                border-radius: 30px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 9999;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                animation: slideDown 0.3s ease;
+            `;
+            toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i> ${message}`;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideUp 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ================================================
+        // تسجيل الخروج
+        // ================================================
+        async function logout() {
+            await fetch(apiBase + '/auth/logout.php', { 
+                method: 'POST',
+                credentials: 'include'
+            });
+            window.location.href = 'index.html';
+        }
+
+        // إضافة أنماط CSS للرسوم المتحركة
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideDown {
+                from { transform: translate(-50%, -100%); opacity: 0; }
+                to { transform: translate(-50%, 0); opacity: 1; }
+            }
+            @keyframes slideUp {
+                from { transform: translate(-50%, 0); opacity: 1; }
+                to { transform: translate(-50%, -100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

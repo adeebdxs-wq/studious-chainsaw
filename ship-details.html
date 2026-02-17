@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تفاصيل السفينة - نظام تسجيل السفن</title>
+    
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #1e4b7a;
+            --primary-dark: #0f2c4a;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --info: #17a2b8;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --white: #ffffff;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans Arabic', sans-serif;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e6eef5 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 16px 32px;
+            border-radius: var(--radius-lg);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .navbar-brand i {
+            font-size: 1.8rem;
+        }
+
+        .navbar-brand h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-light {
+            background: white;
+            color: var(--primary);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #1e7e34);
+            color: white;
+        }
+
+        .ship-header {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 30px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ship-info {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .ship-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+        }
+
+        .ship-details h2 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .ship-meta {
+            display: flex;
+            gap: 20px;
+            color: #64748b;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: rgba(40, 167, 69, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(40, 167, 69, 0.2);
+        }
+
+        .status-pending {
+            background: rgba(255, 193, 7, 0.1);
+            color: #856404;
+            border: 1px solid rgba(255, 193, 7, 0.2);
+        }
+
+        .status-expired {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(220, 53, 69, 0.2);
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .detail-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 25px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .card-header h3 {
+            color: var(--primary);
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-row {
+            display: flex;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f8fafc;
+            border-radius: var(--radius-sm);
+        }
+
+        .info-label {
+            width: 130px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .info-value {
+            flex: 1;
+            color: #64748b;
+        }
+
+        .certificates-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .certificate-item {
+            display: flex;
+            gap: 15px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: var(--radius-md);
+            border-right: 4px solid transparent;
+        }
+
+        .certificate-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .certificate-content {
+            flex: 1;
+        }
+
+        .certificate-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .certificate-number {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .certificate-date {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        .certificate-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .transactions-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .transactions-table th {
+            background: linear-gradient(135deg, rgba(30, 75, 122, 0.05), rgba(15, 44, 74, 0.05));
+            color: var(--primary);
+            padding: 15px;
+            text-align: right;
+            font-weight: 700;
+        }
+
+        .transactions-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .alert-card {
+            background: rgba(255, 193, 7, 0.1);
+            border-right: 4px solid var(--warning);
+            padding: 20px;
+            border-radius: var(--radius-md);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .alert-icon {
+            font-size: 1.5rem;
+            color: var(--warning);
+        }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-title {
+            font-weight: 700;
+            color: #856404;
+            margin-bottom: 5px;
+        }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-content {
+            text-align: center;
+            color: white;
+        }
+
+        .loading-content i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .ship-header {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .ship-info {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .ship-meta {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <div class="navbar-brand">
+                <i class="fas fa-ship"></i>
+                <h1>نظام تسجيل السفن</h1>
+            </div>
+            <div>
+                <button class="btn btn-light" onclick="goBack()">
+                    <i class="fas fa-arrow-right"></i> العودة
+                </button>
+            </div>
+        </nav>
+
+        <div id="loadingOverlay" class="loading-overlay">
+            <div class="loading-content">
+                <i class="fas fa-circle-notch fa-spin"></i>
+                <h3>جاري تحميل بيانات السفينة...</h3>
+            </div>
+        </div>
+
+        <div id="shipContent" style="display: none;">
+            <div class="ship-header">
+                <div class="ship-info">
+                    <div class="ship-icon">
+                        <i class="fas fa-ship"></i>
+                    </div>
+                    <div>
+                        <h2 id="shipNameAr">---</h2>
+                        <p id="shipNameEn" style="color: #64748b;">---</p>
+                        <div class="ship-meta">
+                            <span><i class="fas fa-hashtag"></i> <span id="registrationNumber">---</span></span>
+                            <span><i class="fas fa-flag"></i> <span id="portOfRegistry">---</span></span>
+                            <span><i class="fas fa-calendar"></i> <span id="registrationDate">---</span></span>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <span class="status-badge" id="statusBadge">---</span>
+                </div>
+            </div>
+
+            <div id="expiryAlert" class="alert-card" style="display: none;">
+                <div class="alert-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="alert-content">
+                    <div class="alert-title">تنبيه: الشهادة على وشك الانتهاء</div>
+                    <p id="expiryAlertMessage">شهادة تسجيل السفينة ستنتهي في ---</p>
+                </div>
+                <button class="btn btn-warning" onclick="renewShip()">
+                    <i class="fas fa-sync-alt"></i> تجديد الآن
+                </button>
+            </div>
+
+            <div class="details-grid">
+                <div class="detail-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-info-circle"></i> المعلومات الأساسية</h3>
+                    </div>
+                    <div id="basicInfo"></div>
+                </div>
+
+                <div class="detail-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-cogs"></i> المواصفات الفنية</h3>
+                    </div>
+                    <div id="technicalInfo"></div>
+                </div>
+
+                <div class="detail-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-user"></i> معلومات المالك</h3>
+                    </div>
+                    <div id="ownerInfo"></div>
+                </div>
+
+                <div class="detail-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-file-contract"></i> معلومات التسجيل</h3>
+                    </div>
+                    <div id="registrationInfo"></div>
+                </div>
+            </div>
+
+            <div class="detail-card" style="margin-bottom: 30px;" id="enginesSection">
+                <div class="card-header">
+                    <h3><i class="fas fa-engine"></i> تفاصيل المحركات</h3>
+                </div>
+                <div id="enginesInfo" style="overflow-x: auto;"></div>
+            </div>
+
+            <div class="detail-card" style="margin-bottom: 30px;">
+                <div class="card-header">
+                    <h3><i class="fas fa-certificate"></i> الشهادات والتراخيص</h3>
+                    <button class="btn btn-outline btn-sm" onclick="printCertificate()">
+                        <i class="fas fa-print"></i> طباعة الشهادة
+                    </button>
+                </div>
+                <div id="certificatesList" class="certificates-timeline"></div>
+            </div>
+
+            <div class="detail-card" style="margin-bottom: 30px;">
+                <div class="card-header">
+                    <h3><i class="fas fa-history"></i> سجل المعاملات</h3>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="transactions-table" id="transactionsTable">
+                        <thead>
+                            <tr>
+                                <th>التاريخ</th>
+                                <th>نوع المعاملة</th>
+                                <th>رقم المعاملة</th>
+                                <th>الحالة</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionsBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="action-bar" style="background: white; border-radius: var(--radius-lg); padding: 20px 30px; box-shadow: var(--shadow-md); display: flex; gap: 15px; flex-wrap: wrap; margin-top: 30px;">
+                <button class="btn btn-primary" onclick="printShipDetails()">
+                    <i class="fas fa-print"></i> طباعة التفاصيل
+                </button>
+                <button class="btn btn-outline" onclick="viewApplications()">
+                    <i class="fas fa-file-alt"></i> عرض الطلبات
+                </button>
+                <button class="btn btn-success" onclick="renewShip()" id="renewBtn">
+                    <i class="fas fa-sync-alt"></i> تجديد التسجيل
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const apiBase = '/ship-registration/api';
+        let currentUser = null;
+        let currentShip = null;
+        let shipId = null;
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            await checkAuth();
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            shipId = urlParams.get('id');
+            
+            if (!shipId) {
+                alert('معرف السفينة غير موجود');
+                goBack();
+                return;
+            }
+            
+            await loadShipDetails();
+        });
+
+        async function checkAuth() {
+            try {
+                const response = await fetch(apiBase + '/auth/check_session.php', {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                
+                if (!data.loggedIn) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+                
+                currentUser = data.user;
+                
+            } catch (error) {
+                console.error('خطأ في التحقق من الجلسة:', error);
+                window.location.href = 'index.html';
+            }
+        }
+
+        async function loadShipDetails() {
+            showLoading();
+            
+            try {
+                const response = await fetch(apiBase + '/ships/get_one.php?id=' + shipId, {
+                    credentials: 'include'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('فشل تحميل بيانات السفينة');
+                }
+                
+                currentShip = await response.json();
+                
+                document.getElementById('loadingOverlay').style.display = 'none';
+                document.getElementById('shipContent').style.display = 'block';
+                
+                updateShipUI();
+                
+            } catch (error) {
+                console.error('خطأ في تحميل بيانات السفينة:', error);
+                document.getElementById('loadingOverlay').innerHTML = `
+                    <div class="loading-content">
+                        <i class="fas fa-exclamation-triangle" style="color: var(--danger);"></i>
+                        <h3>حدث خطأ في تحميل بيانات السفينة</h3>
+                        <p>${error.message}</p>
+                        <button class="btn btn-primary" onclick="location.reload()" style="margin-top: 20px;">
+                            <i class="fas fa-redo"></i> إعادة المحاولة
+                        </button>
+                    </div>
+                `;
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function updateShipUI() {
+            document.getElementById('shipNameAr').textContent = currentShip.ship_name_ar || '---';
+            document.getElementById('shipNameEn').textContent = currentShip.ship_name_en || '---';
+            document.getElementById('registrationNumber').textContent = currentShip.registration_number || '---';
+            document.getElementById('portOfRegistry').textContent = getPortName(currentShip.port_of_registry);
+            document.getElementById('registrationDate').textContent = formatDate(currentShip.registration_date);
+            
+            const statusBadge = document.getElementById('statusBadge');
+            const status = currentShip.status || 'pending';
+            statusBadge.textContent = getShipStatusText(status);
+            statusBadge.className = `status-badge status-${status}`;
+            
+            updateBasicInfo();
+            updateTechnicalInfo();
+            updateOwnerInfo();
+            updateRegistrationInfo();
+            updateEnginesInfo();
+            updateCertificates();
+            updateTransactions();
+            checkExpiringCertificates();
+            updateActionButtons();
+        }
+
+        function updateBasicInfo() {
+            let html = `
+                <div class="info-row">
+                    <span class="info-label">نوع السفينة:</span>
+                    <span class="info-value">${currentShip.ship_type || '---'}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">رقم IMO:</span>
+                    <span class="info-value">${currentShip.imo_number || '---'}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">ميناء التسجيل:</span>
+                    <span class="info-value">${getPortName(currentShip.port_of_registry)}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">سنة الصنع:</span>
+                    <span class="info-value">${currentShip.year_built || '---'}</span>
+                </div>
+            `;
+            
+            document.getElementById('basicInfo').innerHTML = html;
+        }
+
+        function updateTechnicalInfo() {
+            let html = `
+                <div class="info-row">
+                    <span class="info-label">الحمولة الإجمالية:</span>
+                    <span class="info-value">${currentShip.gross_tonnage || '---'} طن</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">الحمولة الصافية:</span>
+                    <span class="info-value">${currentShip.net_tonnage || '---'} طن</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">الطول:</span>
+                    <span class="info-value">${currentShip.length || '---'} م</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">العرض:</span>
+                    <span class="info-value">${currentShip.beam || '---'} م</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">الغاطس:</span>
+                    <span class="info-value">${currentShip.draft || '---'} م</span>
+                </div>
+            `;
+            
+            document.getElementById('technicalInfo').innerHTML = html;
+        }
+
+        function updateOwnerInfo() {
+            const owner = currentShip.owner || {};
+            
+            let html = `
+                <div class="info-row">
+                    <span class="info-label">اسم المالك:</span>
+                    <span class="info-value">${owner.full_name || '---'}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">البريد الإلكتروني:</span>
+                    <span class="info-value">${owner.email || '---'}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">رقم الهاتف:</span>
+                    <span class="info-value">${owner.phone || '---'}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">رقم الهوية:</span>
+                    <span class="info-value">${owner.national_id || '---'}</span>
+                </div>
+            `;
+            
+            document.getElementById('ownerInfo').innerHTML = html;
+        }
+
+        function updateRegistrationInfo() {
+            let html = `
+                <div class="info-row">
+                    <span class="info-label">حالة التسجيل:</span>
+                    <span class="info-value">${getShipStatusText(currentShip.status)}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">تاريخ التسجيل:</span>
+                    <span class="info-value">${formatDate(currentShip.registration_date)}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">تاريخ الانتهاء:</span>
+                    <span class="info-value">${formatDate(currentShip.expiry_date)}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">آخر تحديث:</span>
+                    <span class="info-value">${formatDate(currentShip.updated_at)}</span>
+                </div>
+            `;
+            
+            document.getElementById('registrationInfo').innerHTML = html;
+        }
+
+        function updateEnginesInfo() {
+            const engines = currentShip.engines || [];
+            const enginesSection = document.getElementById('enginesSection');
+            
+            if (engines.length === 0) {
+                enginesSection.style.display = 'none';
+                return;
+            }
+            
+            enginesSection.style.display = 'block';
+            
+            let html = `
+                <table class="transactions-table">
+                    <thead>
+                        <tr>
+                            <th>نوع المحرك</th>
+                            <th>القوة</th>
+                            <th>الشركة المصنعة</th>
+                            <th>الموديل</th>
+                            <th>سنة الصنع</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            engines.forEach(engine => {
+                html += `
+                    <tr>
+                        <td>${engine.engine_type || '---'}</td>
+                        <td>${engine.engine_power || '---'} ${engine.engine_power_unit || 'حصان'}</td>
+                        <td>${engine.engine_manufacturer || '---'}</td>
+                        <td>${engine.engine_model || '---'}</td>
+                        <td>${engine.engine_year || '---'}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `</tbody></table>`;
+            document.getElementById('enginesInfo').innerHTML = html;
+        }
+
+        function updateCertificates() {
+            const certificates = currentShip.certificates || [];
+            const container = document.getElementById('certificatesList');
+            
+            if (certificates.length === 0) {
+                container.innerHTML = '<p style="color: #64748b; text-align: center;">لا توجد شهادات مسجلة</p>';
+                return;
+            }
+            
+            let html = '';
+            certificates.sort((a, b) => new Date(b.issue_date) - new Date(a.issue_date));
+            
+            certificates.forEach(cert => {
+                const isExpired = cert.expiry_date && new Date(cert.expiry_date) < new Date();
+                const isExpiring = !isExpired && cert.expiry_date && 
+                    (new Date(cert.expiry_date) - new Date()) / (1000 * 60 * 60 * 24) <= 30;
+                
+                let statusClass = 'status-active';
+                let statusText = 'نشط';
+                
+                if (isExpired) {
+                    statusClass = 'status-expired';
+                    statusText = 'منتهي';
+                } else if (isExpiring) {
+                    statusClass = 'status-pending';
+                    statusText = 'سينتهي قريباً';
+                }
+                
+                const iconColor = isExpired ? '#dc3545' : isExpiring ? '#ffc107' : '#28a745';
+                
+                html += `
+                    <div class="certificate-item">
+                        <div class="certificate-icon" style="background: ${iconColor};">
+                            <i class="fas fa-certificate"></i>
+                        </div>
+                        <div class="certificate-content">
+                            <div class="certificate-header">
+                                <span class="certificate-number">${cert.certificate_number || '---'}</span>
+                                <span class="certificate-date">${formatDate(cert.issue_date)}</span>
+                            </div>
+                            <div style="margin-bottom: 8px;">شهادة تسجيل</div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span class="certificate-status ${statusClass}">${statusText}</span>
+                                <span style="font-size: 0.85rem; color: #64748b;">
+                                    ${cert.expiry_date ? `ينتهي في ${formatDate(cert.expiry_date)}` : ''}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function updateTransactions() {
+            const applications = currentShip.applications || [];
+            const tbody = document.getElementById('transactionsBody');
+            
+            if (applications.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">لا توجد معاملات سابقة</td></tr>';
+                return;
+            }
+            
+            let html = '';
+            applications.sort((a, b) => new Date(b.submission_date) - new Date(a.submission_date));
+            
+            applications.forEach(app => {
+                const statusClass = {
+                    'pending': 'status-pending',
+                    'reviewing': 'status-reviewing',
+                    'approved': 'status-approved',
+                    'completed': 'status-approved'
+                }[app.status] || 'status-pending';
+                
+                html += `
+                    <tr>
+                        <td>${formatDate(app.submission_date)}</td>
+                        <td>${getApplicationTypeText(app.application_type)}</td>
+                        <td>${app.application_number || '---'}</td>
+                        <td><span class="status-badge ${statusClass}" style="padding: 4px 12px;">${getStatusText(app.status)}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline" onclick="viewApplication(${app.id})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+
+        function checkExpiringCertificates() {
+            const expiryAlert = document.getElementById('expiryAlert');
+            const renewBtn = document.getElementById('renewBtn');
+            
+            if (!currentShip.expiry_date) {
+                expiryAlert.style.display = 'none';
+                return;
+            }
+            
+            const expiryDate = new Date(currentShip.expiry_date);
+            const today = new Date();
+            const daysRemaining = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
+            
+            if (daysRemaining <= 30 && daysRemaining > 0) {
+                expiryAlert.style.display = 'flex';
+                document.getElementById('expiryAlertMessage').innerHTML = 
+                    `شهادة تسجيل السفينة ستنتهي بعد ${daysRemaining} يوم`;
+                renewBtn.style.display = 'inline-flex';
+            } else if (daysRemaining <= 0) {
+                expiryAlert.style.display = 'flex';
+                document.getElementById('expiryAlertMessage').innerHTML = 
+                    'شهادة تسجيل السفينة منتهية، يرجى تجديد التسجيل';
+                renewBtn.style.display = 'inline-flex';
+            } else {
+                expiryAlert.style.display = 'none';
+            }
+        }
+
+        function updateActionButtons() {
+            const renewBtn = document.getElementById('renewBtn');
+            
+            if (currentUser.role !== 'ship_owner' || currentUser.id !== currentShip.owner_id) {
+                renewBtn.style.display = 'none';
+            }
+        }
+
+        async function renewShip() {
+            if (!confirm('هل أنت متأكد من تجديد تسجيل هذه السفينة؟')) return;
+            
+            showLoading('جاري إنشاء طلب التجديد...');
+            
+            try {
+                const response = await fetch(apiBase + '/applications/create.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        shipId: currentShip.id,
+                        applicationType: 'renewal'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showToast('✅ تم إنشاء طلب التجديد بنجاح', 'success');
+                    setTimeout(() => {
+                        window.location.href = `application-details.html?id=${result.applicationId}`;
+                    }, 1500);
+                } else {
+                    throw new Error(result.error || 'حدث خطأ');
+                }
+            } catch (error) {
+                showToast('خطأ: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function printShipDetails() {
+            window.print();
+        }
+
+        function printCertificate() {
+            const activeCert = currentShip.certificates?.find(c => 
+                c.status === 'active' && new Date(c.expiry_date) > new Date()
+            );
+            
+            if (activeCert) {
+                window.open(`print-certificate.html?cert=${activeCert.id}`, '_blank');
+            } else {
+                showToast('لا توجد شهادة نشطة للطباعة', 'warning');
+            }
+        }
+
+        function viewApplications() {
+            window.location.href = `applications.html?ship=${shipId}`;
+        }
+
+        function viewApplication(applicationId) {
+            window.location.href = `application-details.html?id=${applicationId}`;
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+
+        function formatDate(date) {
+            if (!date) return '---';
+            const d = new Date(date);
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function getPortName(port) {
+            const ports = {
+                'aden': 'عدن',
+                'mukalla': 'المكلا',
+                'hodeidah': 'الحديدة'
+            };
+            return ports[port] || port || '---';
+        }
+
+        function getShipStatusText(status) {
+            const statusMap = {
+                'active': 'نشط',
+                'pending': 'قيد المراجعة',
+                'expired': 'منتهي',
+                'suspended': 'موقوف'
+            };
+            return statusMap[status] || status;
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'pending': 'قيد المراجعة',
+                'reviewing': 'جاري المعالجة',
+                'approved': 'مقبول',
+                'rejected': 'مرفوض',
+                'completed': 'مكتمل'
+            };
+            return statusMap[status] || status;
+        }
+
+        function getApplicationTypeText(type) {
+            const typeMap = {
+                'new': 'تسجيل جديد',
+                'renewal': 'تجديد',
+                'amendment': 'تعديل بيانات',
+                'cancellation': 'إلغاء تسجيل'
+            };
+            return typeMap[type] || type;
+        }
+
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: ${type === 'success' ? 'linear-gradient(135deg, #28a745, #1e7e34)' : 
+                             type === 'error' ? 'linear-gradient(135deg, #dc3545, #c82333)' : 
+                             'linear-gradient(135deg, #1e4b7a, #0f2c4a)'};
+                color: white;
+                padding: 12px 24px;
+                border-radius: 30px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 9999;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                animation: slideDown 0.3s ease;
+            `;
+            toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i> ${message}`;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideUp 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل دخول الموظفين - نظام تسجيل السفن</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e4b7a;
+            --primary-dark: #0f2c4a;
+            --success: #28a745;
+            --danger: #dc3545;
+            --border-color: #e2e8f0;
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --radius-lg: 16px;
+            --radius-md: 10px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Noto Sans Arabic', sans-serif;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e6eef5 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 16px 32px;
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .nav-brand i { font-size: 1.8rem; }
+        .nav-brand h1 { font-size: 1.5rem; }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-light {
+            background: white;
+            color: var(--primary);
+        }
+        
+        .btn-light:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid white;
+            color: white;
+        }
+        
+        .login-container {
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 40px;
+            margin: 40px auto;
+            max-width: 500px;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .login-header i {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .login-header h2 { color: var(--primary); margin-bottom: 5px; }
+        .login-header p { color: #64748b; }
+        
+        .branch-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .branch-option {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .branch-option:hover { border-color: var(--primary); transform: translateY(-2px); }
+        .branch-option.selected { border-color: var(--primary); background: #f0f9ff; }
+        .branch-option i { font-size: 1.5rem; color: var(--primary); margin-bottom: 8px; }
+        .branch-option h4 { margin-bottom: 5px; }
+        .branch-option p { font-size: 0.85rem; color: #64748b; }
+        
+        .form-group { margin-bottom: 20px; }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-family: inherit;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(30, 75, 122, 0.1);
+        }
+        
+        .password-wrapper { position: relative; }
+        
+        .toggle-password {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+        }
+        
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+        
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        
+        .demo-credentials {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .demo-credentials h4 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .credential-item {
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            border-right: 3px solid var(--primary);
+        }
+        
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .loading-content { text-align: center; color: white; }
+        .loading-content i { font-size: 3rem; margin-bottom: 20px; }
+        
+        .error-message {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container container">
+            <a href="index.html" class="nav-brand">
+                <i class="fas fa-ship"></i>
+                <h1>نظام تسجيل السفن</h1>
+            </a>
+            <a href="ship-owner-login.html" class="btn btn-outline">
+                <i class="fas fa-user-tie"></i> دخول الملاك
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="login-container">
+            <div class="login-header">
+                <i class="fas fa-user-shield"></i>
+                <h2>تسجيل دخول الموظفين</h2>
+                <p>اختر الفرع ثم سجل دخولك</p>
+            </div>
+
+            <div class="branch-selector" id="branchSelector">
+                <div class="branch-option selected" data-branch="main" data-email="admin@maritime.gov.ye" data-password="admin123">
+                    <i class="fas fa-building"></i>
+                    <h4>المقر الرئيسي</h4>
+                    <p>المسؤول</p>
+                </div>
+                <div class="branch-option" data-branch="aden" data-email="aden@maritime.gov.ye" data-password="aden123">
+                    <i class="fas fa-anchor"></i>
+                    <h4>فرع عدن</h4>
+                    
+                </div>
+                <div class="branch-option" data-branch="mukalla" data-email="mukalla@maritime.gov.ye" data-password="mukalla123">
+                    <i class="fas fa-ship"></i>
+                    <h4>فرع المكلا</h4>
+                   
+                </div>
+            </div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> البريد الإلكتروني</label>
+                    <input type="email" id="email" class="form-control" value="admin@maritime.gov.ye" required>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> كلمة المرور</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="password" class="form-control" value="admin123" required>
+                        <button type="button" class="toggle-password" onclick="togglePassword()">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary">تسجيل الدخول</button>
+            </form>
+
+            <div class="demo-credentials">
+                <h4><i class="fas fa-key"></i> بيانات الدخول التجريبية</h4>
+                <div class="credential-item">
+                    <strong>المقر الرئيسي:</strong> admin@maritime.gov.ye / admin123
+                </div>
+                <div class="credential-item">
+                    <strong>فرع عدن:</strong> aden@maritime.gov.ye / aden123
+                </div>
+                <div class="credential-item">
+                    <strong>فرع المكلا:</strong> mukalla@maritime.gov.ye / mukalla123
+                </div>
+            </div>
+            
+            <div class="footer">
+                <p>© 2025 الهيئة العامة للشئون البحرية</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-content">
+            <i class="fas fa-circle-notch fa-spin"></i>
+            <h3>جاري تسجيل الدخول...</h3>
+        </div>
+    </div>
+
+    <script>
+        const apiBase = '/ship-registration/api';
+
+        // اختيار الفرع
+        document.querySelectorAll('.branch-option').forEach(opt => {
+            opt.addEventListener('click', function() {
+                document.querySelectorAll('.branch-option').forEach(o => o.classList.remove('selected'));
+                this.classList.add('selected');
+                
+                const email = this.dataset.email;
+                const password = this.dataset.password;
+                document.getElementById('email').value = email;
+                document.getElementById('password').value = password;
+            });
+        });
+
+        // إظهار/إخفاء كلمة المرور
+        function togglePassword() {
+            const input = document.getElementById('password');
+            const icon = document.querySelector('.toggle-password i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        }
+
+        // تسجيل الدخول
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            document.getElementById('loadingOverlay').style.display = 'flex';
+
+            try {
+                const response = await fetch(apiBase + '/auth/login.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('currentUser', JSON.stringify(data.user));
+                    
+                    if (data.user.role === 'admin') {
+                        window.location.href = 'admin-dashboard.html';
+                    } else {
+                        window.location.href = 'branch-employee-dashboard.html';
+                    }
+                } else {
+                    throw new Error(data.error || 'فشل تسجيل الدخول');
+                }
+            } catch (error) {
+                document.getElementById('loadingOverlay').style.display = 'none';
+                showError(error.message);
+            }
+        });
+
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message}`;
+            
+            const form = document.getElementById('loginForm');
+            form.parentNode.insertBefore(errorDiv, form);
+            
+            setTimeout(() => errorDiv.remove(), 5000);
+        }
+    </script>
+</body>
+</html>

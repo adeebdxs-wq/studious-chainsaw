@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>طباعة طلب تسجيل السفينة - الهيئة العامة للشئون البحرية</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1e4b7a;
+            --primary-dark: #0f2c4a;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Noto Sans Arabic', sans-serif;
+            background: #e6e9ef;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .print-container {
+            max-width: 900px;
+            width: 100%;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            padding: 45px 50px;
+            border: 1px solid #d0d5dd;
+            position: relative;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+        }
+
+        .header h3 {
+            font-size: 20px;
+            font-weight: 700;
+            border-bottom: 2px solid var(--primary);
+            display: inline-block;
+            padding-bottom: 5px;
+            margin-top: 15px;
+        }
+
+        hr {
+            border: none;
+            border-top: 2px solid black;
+            margin: 15px 0;
+        }
+
+        .section-title {
+            font-weight: 700;
+            font-size: 18px;
+            margin: 30px 0 20px;
+            border-bottom: 1.5px solid var(--primary);
+            padding-bottom: 6px;
+            color: var(--primary);
+        }
+
+        .field-row {
+            display: flex;
+            align-items: baseline;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .field-label {
+            font-weight: 700;
+            min-width: 170px;
+            font-size: 15px;
+            color: #1e1e1e;
+        }
+
+        .field-value {
+            font-weight: 600;
+            color: var(--primary);
+            border-bottom: 1px solid #555;
+            padding-bottom: 2px;
+            padding-right: 10px;
+            flex: 1;
+            font-size: 15px;
+            min-height: 25px;
+        }
+
+        .fees-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            border: 1px solid #ddd;
+        }
+
+        .fees-table th {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 12px;
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .fees-table td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .fees-table .total-row {
+            background: #f0f9ff;
+            font-weight: 700;
+        }
+
+        .fees-table .total-row td {
+            border-top: 2px solid var(--primary);
+        }
+
+        .declaration-box {
+            margin: 40px 0 30px;
+            padding: 20px 0;
+            border-top: 1px solid black;
+            border-bottom: 1px solid black;
+        }
+
+        .declaration-text {
+            font-size: 15px;
+            line-height: 1.9;
+            font-weight: 500;
+        }
+
+        .signature-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+        }
+
+        .signature-box {
+            width: 45%;
+        }
+
+        .signature-line {
+            border-bottom: 1px solid black;
+            height: 40px;
+            margin-bottom: 5px;
+        }
+
+        .signature-label {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 12px;
+            color: #64748b;
+            border-top: 1px solid #ccc;
+            padding-top: 20px;
+        }
+
+        .watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 80px;
+            color: rgba(0,0,0,0.03);
+            z-index: -1;
+            pointer-events: none;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .print-controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-print {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-print:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-close {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-close:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        @media print {
+            body {
+                background: none;
+                padding: 0;
+            }
+            .print-container {
+                box-shadow: none;
+                border: none;
+                padding: 40px;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="watermark">
+        <i class="fas fa-ship"></i> الهيئة العامة للشئون البحرية
+    </div>
+    
+    <div class="print-controls no-print">
+        <button onclick="window.print()" class="btn btn-print">
+            <i class="fas fa-print"></i> طباعة
+        </button>
+        <button onclick="window.close()" class="btn btn-close">
+            <i class="fas fa-times"></i> إغلاق
+        </button>
+    </div>
+
+    <div class="print-container">
+        <div class="header">
+            <h1>الجمهورية اليمنية</h1>
+            <h2>وزارة النقل - الهيئة العامة للشئون البحرية</h2>
+            <h3>طلب تسجيل سفينة</h3>
+        </div>
+        <hr>
+
+        <div class="section-title">أولاً: بيانات المالك</div>
+        
+        <div class="field-row">
+            <span class="field-label">الاسم الكامل:</span>
+            <span class="field-value" id="ownerNameDisplay">_________________________</span>
+        </div>
+        
+        <div class="field-row">
+            <span class="field-label">رقم الهوية:</span>
+            <span class="field-value" id="nationalIdDisplay">_________________________</span>
+        </div>
+        
+        <div class="field-row">
+            <span class="field-label">الجنسية:</span>
+            <span class="field-value" id="nationalityDisplay">يمني</span>
+        </div>
+        
+        <div class="field-row">
+            <span class="field-label">رقم الجوال:</span>
+            <span class="field-value" id="phoneDisplay">_________________________</span>
+        </div>
+        
+        <div class="field-row">
+            <span class="field-label">البريد الإلكتروني:</span>
+            <span class="field-value" id="emailDisplay">_________________________</span>
+        </div>
+        
+        <div class="field-row">
+            <span class="field-label">العنوان:</span>
+            <span class="field-value" id="addressDisplay">_________________________</span>
+        </div>
+
+        <div class="section-title">ثانياً: بيانات السفينة</div>
+        
+        <div class="field-row">
+            <span class="field-label">اسم السفينة:</span>
+            <span class="field-value" id="shipNameArDisplay">_________________________</span>
+        </div>
+        
+        <div class="field-row">
+            <span class="field-label">اسم السفينة (إنجليزي):</span>
+            <span class="field-value" id="shipNameEnDisplay">_________________________</span>
+        </div>
+        
+        <div class="field-row">
+            <span class="field-label">الأسماء السابقة:</span>
+            <span class="field-value" id="previousNamesDisplay">_________________________</span>
+        </div>
+        
+        <div class="field-row">
+            <span class="field-label">رقم IMO:</span>
+            <span class="field-value" id="imoNumberDisplay">_________________________</span>
+        </div>
+        
+        <div class="field-row">
+            <span class="field-label">آخر ميناء تسجيل:</span>
+            <span class="field-value" id="lastPortDisplay">_________________________</span>
+        </div>
+        
+        <div class="field-row">
+            <span class="field-label">نوع السفينة:</span>
+            <span class="field-value" id="shipTypeDisplay">_________________________</span>
+        </div>
+        
+        <div class="field-row">
+            <span class="field-label">تاريخ البناء:</span>
+            <span class="field-value" id="buildDateDisplay">_________________________</span>
+        </div>
+        
+        <div class="field-row">
+            <span class="field-label">مكان البناء:</span>
+            <span class="field-value" id="buildPlaceDisplay">_________________________</span>
+        </div>
+        
+        <div class="field-row">
+            <span class="field-label">الشركة المنشئة:</span>
+            <span class="field-value" id="builderNameDisplay">_________________________</span>
+        </div>
+        
+        <div class="field-row">
+            <span class="field-label">نوع الهيكل:</span>
+            <span class="field-value" id="hullTypeDisplay">_________________________</span>
+        </div>
+        
+        <div class="field-row">
+            <span class="field-label">الحمولة الإجمالية:</span>
+            <span class="field-value" id="grossTonnageDisplay">_________________________ طن</span>
+        </div>
+        
+        <div class="field-row">
+            <span class="field-label">الطول:</span>
+            <span class="field-value" id="lengthDisplay">_________________________ م</span>
+        </div>
+        
+        <div class="field-row">
+            <span class="field-label">العرض:</span>
+            <span class="field-value" id="widthDisplay">_________________________ م</span>
+        </div>
+        
+        <div class="field-row">
+            <span class="field-label">الغاطس:</span>
+            <span class="field-value" id="draftDisplay">_________________________ م</span>
+        </div>
+        
+        <div class="field-row">
+            <span class="field-label">قوة المحرك:</span>
+            <span class="field-value" id="enginePowerDisplay">_________________________ حصان</span>
+        </div>
+        
+        <div class="field-row">
+            <span class="field-label">نوع المحرك:</span>
+            <span class="field-value" id="engineTypeDisplay">_________________________</span>
+        </div>
+        
+        <div class="field-row">
+            <span class="field-label">عدد أفراد الطاقم:</span>
+            <span class="field-value" id="crewCountDisplay">_________________________</span>
+        </div>
+        
+        <div class="field-row">
+            <span class="field-label">سعة الركاب:</span>
+            <span class="field-value" id="passengerCapacityDisplay">_________________________</span>
+        </div>
+        
+        <div class="field-row">
+            <span class="field-label">ميناء التسجيل:</span>
+            <span class="field-value" id="portOfRegistryDisplay">_________________________</span>
+        </div>
+
+        <div class="section-title">ثالثاً: تفاصيل الرسوم</div>
+        
+        <table class="fees-table" id="feesTable">
+            <thead>
+                <tr>
+                    <th>البيان</th>
+                    <th>المبلغ ($)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>رسوم مراجعة الوثائق (ثابتة)</td>
+                    <td id="documentFeeDisplay">300</td>
+                </tr>
+                <tr>
+                    <td>رسوم المسح الفني</td>
+                    <td id="surveyFeeDisplay">0</td>
+                </tr>
+                <tr>
+                    <td>رسوم الشهادة المؤقتة (0.50$ لكل طن)</td>
+                    <td id="tempCertFeeDisplay">0.00</td>
+                </tr>
+                <tr>
+                    <td>رسوم الشهادة النهائية (1.50$ لكل طن)</td>
+                    <td id="finalCertFeeDisplay">0.00</td>
+                </tr>
+                <tr class="total-row">
+                    <td><strong>الإجمالي الكلي</strong></td>
+                    <td><strong id="totalFeesDisplay">0.00</strong></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="declaration-box">
+            <div class="declaration-text">
+                <p>أقر أنا مقدم الطلب بأن جميع البيانات المدرجة في هذا الطلب صحيحة وكاملة، وإنني أتحمل المسؤولية القانونية الكاملة عن صحة المعلومات والمستندات المرفقة.</p>
+                <p style="margin-top: 10px; font-style: italic; color: #666;">I hereby declare that all the information provided in this application is true and complete, and I assume full legal responsibility for the accuracy of the information and attached documents.</p>
+            </div>
+        </div>
+
+        <div class="signature-section">
+            <div class="signature-box">
+                <div class="signature-line"></div>
+                <div class="signature-label">توقيع مقدم الطلب</div>
+            </div>
+            <div class="signature-box" style="text-align: center;">
+                <div class="signature-line"></div>
+                <div class="signature-label">تاريخ التقديم: <span id="submissionDateDisplay">____/____/______</span></div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>الهيئة العامة للشئون البحرية - الجمهورية اليمنية</p>
+            <p>تم إنشاء هذا الطلب إلكترونياً عبر نظام تسجيل السفن</p>
+        </div>
+    </div>
+
+    <script>
+        function setText(elementId, value, defaultValue = '_________________________') {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = (value && value !== '' && value !== null && value !== undefined) ? value : defaultValue;
+            }
+        }
+
+        function formatNumber(number) {
+            if (!number && number !== 0) return '0.00';
+            return Number(number).toFixed(2);
+        }
+
+        function getPortName(port) {
+            const ports = {
+                'aden': 'عدن',
+                'mukalla': 'المكلا',
+                'hodeidah': 'الحديدة'
+            };
+            return ports[port] || port || '---';
+        }
+
+        function loadPrintData() {
+            const savedData = sessionStorage.getItem('shipRegistrationData');
+            
+            if (!savedData) {
+                document.body.innerHTML = `
+                    <div style="text-align: center; padding: 100px; background: white; border-radius: 10px; max-width: 500px; margin: 50px auto;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 50px; color: #dc3545; margin-bottom: 20px;"></i>
+                        <h2 style="color: #dc3545;">لا توجد بيانات للطباعة</h2>
+                        <p style="margin: 20px 0; color: #666;">الرجاء العودة إلى صفحة تسجيل السفينة وتعبئة البيانات أولاً.</p>
+                        <button onclick="window.close()" style="padding: 10px 30px; background: #1e4b7a; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                            <i class="fas fa-times"></i> إغلاق
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            try {
+                const data = JSON.parse(savedData);
+                
+                setText('ownerNameDisplay', data.fullName);
+                setText('nationalIdDisplay', data.nationalId);
+                setText('nationalityDisplay', data.nationality === 'YE' ? 'يمني' : data.nationality);
+                setText('phoneDisplay', data.phone);
+                setText('emailDisplay', data.email);
+                setText('addressDisplay', data.address);
+                
+                setText('shipNameArDisplay', data.shipName);
+                setText('shipNameEnDisplay', data.shipNameEn);
+                setText('previousNamesDisplay', data.previousNames);
+                setText('imoNumberDisplay', data.imoNumber);
+                setText('lastPortDisplay', data.lastPort);
+                setText('shipTypeDisplay', data.shipType);
+                setText('buildDateDisplay', data.buildDate);
+                setText('buildPlaceDisplay', data.buildPlace);
+                setText('builderNameDisplay', data.builderName);
+                setText('hullTypeDisplay', data.hullType);
+                setText('grossTonnageDisplay', data.grossTonnage);
+                setText('lengthDisplay', data.length);
+                setText('widthDisplay', data.width);
+                setText('draftDisplay', data.draft);
+                setText('enginePowerDisplay', data.enginePower);
+                setText('engineTypeDisplay', data.engineType);
+                setText('crewCountDisplay', data.crewCount);
+                setText('passengerCapacityDisplay', data.passengerCapacity);
+                setText('portOfRegistryDisplay', getPortName(data.portOfRegistry));
+                
+                if (data.fees) {
+                    const fees = data.fees;
+                    
+                    setText('documentFeeDisplay', fees.documentFee);
+                    setText('surveyFeeDisplay', fees.surveyFee);
+                    setText('tempCertFeeDisplay', formatNumber(fees.tempCertFee));
+                    setText('finalCertFeeDisplay', formatNumber(fees.finalCertFee));
+                    setText('totalFeesDisplay', formatNumber(fees.fullTotal));
+                }
+                
+                if (data.submissionDate) {
+                    setText('submissionDateDisplay', data.submissionDate);
+                } else {
+                    const today = new Date();
+                    const day = String(today.getDate()).padStart(2, '0');
+                    const month = String(today.getMonth() + 1).padStart(2, '0');
+                    const year = today.getFullYear();
+                    setText('submissionDateDisplay', `${day}/${month}/${year}`);
+                }
+                
+            } catch (error) {
+                console.error('خطأ في قراءة البيانات:', error);
+                alert('حدث خطأ في قراءة بيانات الطلب');
+            }
+        }
+
+        window.onload = loadPrintData;
+    </script>
+</body>
+</html>
