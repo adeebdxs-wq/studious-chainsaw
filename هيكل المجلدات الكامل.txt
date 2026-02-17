@@ -1,0 +1,75 @@
+C:\xampp\htdocs\ship-registration\
+│
+├── index.html
+├── login.html
+├── ship-owner-login.html
+├── ship-owner-register.html
+├── ship-owner-dashboard.html
+├── admin-dashboard.html
+├── branch-employee-dashboard.html
+├── application-details.html
+├── ship-details.html
+├── ship-application-print.html
+├── reports.html
+│
+├── assets/
+│   └── images/
+│       └── logo.png
+│
+├── css/
+│   ├── style.css
+│   ├── components.css
+│   └── responsive.css
+│
+├── js/
+│   ├── main.js
+│   ├── auth.js
+│   └── dashboard-functions.js
+│
+├── api/
+│   ├── config.php
+│   ├── auth/
+│   │   ├── login.php
+│   │   ├── logout.php
+│   │   ├── register.php
+│   │   └── check_session.php
+│   ├── users/
+│   │   ├── get.php
+│   │   ├── get_one.php
+│   │   ├── add.php
+│   │   ├── update.php
+│   │   └── delete.php
+│   ├── branches/
+│   │   └── get_employees.php
+│   ├── applications/
+│   │   ├── get.php
+│   │   ├── get_one.php
+│   │   ├── get_by_branch.php
+│   │   ├── assign.php
+│   │   ├── reject.php
+│   │   ├── modify.php
+│   │   ├── issue_certificate.php
+│   │   └── update_status.php
+│   ├── ships/
+│   │   ├── get.php
+│   │   ├── get_one.php
+│   │   ├── add.php
+│   │   └── update.php
+│   ├── documents/
+│   │   ├── upload.php
+│   │   └── verify.php
+│   ├── payments/
+│   │   ├── verify.php
+│   │   └── receipt.php
+│   ├── certificates/
+│   │   ├── get.php
+│   │   └── print.php
+│   ├── notifications/
+│   │   ├── get.php
+│   │   └── mark_read.php
+│   └── reports/
+│       └── data.php
+│
+└── uploads/
+    ├── documents/
+    └── payments/
